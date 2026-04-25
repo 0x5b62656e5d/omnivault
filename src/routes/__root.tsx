@@ -8,6 +8,8 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
+import { NotFound } from "@/components/notFound";
+import { opengraphTags, twitterTags } from "@/lib/seo";
 
 interface MyRouterContext {
     queryClient: QueryClient;
@@ -24,7 +26,26 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
                 content: "width=device-width, initial-scale=1",
             },
             {
-                title: "TanStack Start Starter",
+                title: "Omnivault",
+            },
+            {
+                name: "description",
+                content: "",
+            },
+            ...opengraphTags,
+            ...twitterTags,
+            {
+                name: "manifest",
+                content: "https://omnivault.benkou.dev/manifest.json",
+            },
+            {
+                name: "keywords",
+                content:
+                    "omnivault, s3, storage, cloud, buckets, self-hosted, storage manager",
+            },
+            {
+                name: "robots",
+                content: "index, follow",
             },
         ],
         links: [
@@ -35,6 +56,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ],
     }),
     shellComponent: RootDocument,
+    notFoundComponent: NotFound,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {

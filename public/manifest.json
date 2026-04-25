@@ -1,6 +1,6 @@
 {
-    "short_name": "TanStack App",
-    "name": "Create TanStack App Sample",
+    "short_name": "Omnivault",
+    "name": "Omnivault",
     "icons": [
         {
             "src": "favicon.ico",
@@ -18,8 +18,7 @@
             "sizes": "512x512"
         }
     ],
-    "start_url": ".",
-    "display": "standalone",
+    "start_url": "/",
     "theme_color": "#000000",
     "background_color": "#ffffff"
 }
