@@ -23,9 +23,11 @@
         "db:migrate": "drizzle-kit migrate",
         "db:push": "drizzle-kit push",
         "db:pull": "drizzle-kit pull",
-        "db:studio": "drizzle-kit studio"
+        "db:studio": "drizzle-kit studio",
+        "auth:generate": "auth generate --output ./src/db/auth-schema.ts --config ./src/lib/auth.ts -y"
     },
     "dependencies": {
+        "@better-auth/drizzle-adapter": "^1.6.9",
         "@faker-js/faker": "^10.4.0",
         "@t3-oss/env-core": "^0.13.11",
         "@tailwindcss/vite": "^4.2.4",
@@ -69,6 +71,7 @@
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.1",
+        "auth": "^1.6.9",
         "dotenv": "^17.4.2",
         "jsdom": "^29.0.2",
         "tsx": "^4.21.0",
