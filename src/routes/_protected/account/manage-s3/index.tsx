@@ -1,0 +1,394 @@
+import { useForm } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import type { InferSelectModel } from "drizzle-orm";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { IoClose } from "react-icons/io5";
+import { Button } from "@/components/ui/button";
+import type { s3credentials } from "@/db/schema";
+
+type S3Credential = InferSelectModel<typeof s3credentials>;
+
+export const Route = createFileRoute("/_protected/account/manage-s3/")({
+    component: RouteComponent,
+});
+
+function RouteComponent() {
+    const { queryClient } = Route.useRouteContext();
+    const [showAddAccountForm, setShowAddAccountForm] = useState(false);
+    const [deleteConfirmationId, setDeleteConfirmationId] = useState<
+        string | null
+    >(null);
+
+    const form = useForm({
+        defaultValues: {
+            name: "",
+            accessKeyId: "",
+            secretAccessKey: "",
+            endpointUrl: "",
+        },
+        onSubmit: async ({ value }) => {
+            setShowAddAccountForm(false);
+
+            const res = await fetch("/api/s3/accounts", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(value),
+            });
+
+            if (!res.ok) {
+                console.error("S3 account mgmt error 101");
+            }
+
+            form.reset();
+            queryClient.invalidateQueries({
+                queryKey: ["s3-accounts"],
+            });
+        },
+    });
+
+    const { data, isLoading, error, isError } = useQuery({
+        queryKey: ["s3-accounts"],
+        queryFn: async () => {
+            const res = await fetch("/api/s3/accounts");
+
+            if (!res.ok) {
+                throw new Error("S3 account mgmt error 102");
+            }
+
+            const json = await res.json();
+
+            if (!json.success) {
+                throw new Error("S3 account mgmt error 103");
+            }
+
+            return json.data as S3Credential[];
+        },
+    });
+
+    const handleDeleteAccount = async (accountId: string) => {
+        if (deleteConfirmationId !== accountId) {
+            setDeleteConfirmationId(accountId);
+            return;
+        }
+
+        setDeleteConfirmationId(null);
+
+        const res = await fetch(`/api/s3/accounts`, {
+            method: "DELETE",
+            body: JSON.stringify({ id: accountId }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            console.error("S3 account mgmt error 104");
+        }
+
+        queryClient.invalidateQueries({
+            queryKey: ["s3-accounts"],
+        });
+    };
+
+    const handleAddAccount = () => {
+        setShowAddAccountForm(true);
+    };
+
+    const handleCloseAddAccountForm = () => {
+        setShowAddAccountForm(false);
+        form.reset();
+    };
+
+    return (
+        <main>
+            <h1>Manage S3 accounts</h1>
+            <div className="flex flex-col justify-center items-center gap-2">
+                {isLoading && <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />}
+                {isError && <p>Error fetching S3 accounts</p>}
+                {data?.map(account => (
+                    <div
+                        key={account.id}
+                        className="border p-4 rounded w-full max-w-md"
+                    >
+                        <p>
+                            <strong>Name:</strong> {account.name}
+                        </p>
+                        <p>
+                            <strong>Date created:</strong>{" "}
+                            {account.createdAt
+                                ? new Date(
+                                      account.createdAt,
+                                  ).toLocaleDateString()
+                                : "Unknown"}
+                        </p>
+                        <Button
+                            variant="destructive"
+                            onClick={() => handleDeleteAccount(account.id)}
+                            className="min-w-48 overflow-hidden"
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.span
+                                    key={
+                                        deleteConfirmationId === account.id
+                                            ? "confirm"
+                                            : "delete"
+                                    }
+                                    initial={{ rotateX: -90, opacity: 0 }}
+                                    animate={{ rotateX: 0, opacity: 1 }}
+                                    exit={{ rotateX: 90, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="inline-block"
+                                >
+                                    {deleteConfirmationId === account.id
+                                        ? "Click again to confirm"
+                                        : "Delete"}
+                                </motion.span>
+                            </AnimatePresence>
+                        </Button>
+                    </div>
+                ))}
+                {isError && (
+                    <p className="text-destructive">
+                        {(error as Error).message}
+                    </p>
+                )}
+                <Button onClick={handleAddAccount}>Add S3 Account</Button>
+
+                <AnimatePresence>
+                    {showAddAccountForm && (
+                        <motion.div
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.div
+                                className="relative w-full max-w-lg rounded-xl border bg-background p-6 shadow-2xl"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <button
+                                    type="button"
+                                    onClick={handleCloseAddAccountForm}
+                                    className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-muted"
+                                    aria-label="Close add S3 account form"
+                                >
+                                    <IoClose className="h-6 w-6" />
+                                </button>
+
+                                <div className="mb-6">
+                                    <h2 className="text-xl font-semibold">
+                                        Add S3 Account
+                                    </h2>
+                                    <p className="text-sm text-muted-foreground">
+                                        Add your S3-compatible credentials to
+                                        connect a storage provider.
+                                    </p>
+                                </div>
+
+                                <form
+                                    className="flex flex-col gap-4"
+                                    onSubmit={event => {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        void form.handleSubmit();
+                                    }}
+                                >
+                                    <form.Field
+                                        name="name"
+                                        validators={{
+                                            onChange: ({ value }) => {
+                                                if (!value.trim()) {
+                                                    return "Name is required";
+                                                }
+
+                                                return undefined;
+                                            },
+                                        }}
+                                    >
+                                        {field => (
+                                            <label className="flex flex-col gap-1">
+                                                <span className="text-sm font-medium">
+                                                    Name
+                                                </span>
+                                                <input
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={event => {
+                                                        field.handleChange(
+                                                            event.target.value,
+                                                        );
+                                                    }}
+                                                    placeholder="Personal AWS account"
+                                                    className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                                />
+                                                {field.state.meta.errors
+                                                    .length > 0 && (
+                                                    <span className="text-sm text-destructive">
+                                                        {field.state.meta.errors.join(
+                                                            ", ",
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </label>
+                                        )}
+                                    </form.Field>
+
+                                    <form.Field
+                                        name="accessKeyId"
+                                        validators={{
+                                            onChange: ({ value }) => {
+                                                if (!value.trim()) {
+                                                    return "Access key ID is required";
+                                                }
+
+                                                return undefined;
+                                            },
+                                        }}
+                                    >
+                                        {field => (
+                                            <label className="flex flex-col gap-1">
+                                                <span className="text-sm font-medium">
+                                                    Access Key ID
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={event => {
+                                                        field.handleChange(
+                                                            event.target.value,
+                                                        );
+                                                    }}
+                                                    placeholder="••••••••••••••••"
+                                                    className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                                />
+                                                {field.state.meta.errors
+                                                    .length > 0 && (
+                                                    <span className="text-sm text-destructive">
+                                                        {field.state.meta.errors.join(
+                                                            ", ",
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </label>
+                                        )}
+                                    </form.Field>
+
+                                    <form.Field
+                                        name="secretAccessKey"
+                                        validators={{
+                                            onChange: ({ value }) => {
+                                                if (!value.trim()) {
+                                                    return "Secret access key is required";
+                                                }
+
+                                                return undefined;
+                                            },
+                                        }}
+                                    >
+                                        {field => (
+                                            <label className="flex flex-col gap-1">
+                                                <span className="text-sm font-medium">
+                                                    Secret Access Key
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={event => {
+                                                        field.handleChange(
+                                                            event.target.value,
+                                                        );
+                                                    }}
+                                                    placeholder="••••••••••••••••"
+                                                    className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                                />
+                                                {field.state.meta.errors
+                                                    .length > 0 && (
+                                                    <span className="text-sm text-destructive">
+                                                        {field.state.meta.errors.join(
+                                                            ", ",
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </label>
+                                        )}
+                                    </form.Field>
+
+                                    <form.Field
+                                        name="endpointUrl"
+                                        validators={{
+                                            onChange: ({ value }) => {
+                                                if (!value.trim()) {
+                                                    return undefined;
+                                                }
+
+                                                try {
+                                                    new URL(value);
+                                                    return undefined;
+                                                } catch {
+                                                    return "Invalid URL";
+                                                }
+                                            },
+                                        }}
+                                    >
+                                        {field => (
+                                            <label className="flex flex-col gap-1">
+                                                <span className="text-sm font-medium">
+                                                    Endpoint URL
+                                                    <span className="ml-1 text-muted-foreground">
+                                                        (optional)
+                                                    </span>
+                                                </span>
+                                                <input
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={event => {
+                                                        field.handleChange(
+                                                            event.target.value,
+                                                        );
+                                                    }}
+                                                    placeholder="https://s3.amazonaws.com"
+                                                    className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                                />
+                                                {field.state.meta.errors
+                                                    .length > 0 && (
+                                                    <span className="text-sm text-destructive">
+                                                        {field.state.meta.errors.join(
+                                                            ", ",
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </label>
+                                        )}
+                                    </form.Field>
+
+                                    <div className="mt-2 flex justify-end gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleCloseAddAccountForm}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit">
+                                            Add account
+                                        </Button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </main>
+    );
+}
