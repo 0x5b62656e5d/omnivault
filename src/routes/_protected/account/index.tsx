@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
 import { Button } from "@/components/ui/button";
@@ -15,18 +15,21 @@ function DashboardLayout() {
     const [isLoading, setIsLoading] = useState(true);
     const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
-    useEffect(() => {
-        (async () => {
-            const accountList = await authClient.listAccounts();
+    const loadProviders = useCallback(async () => {
+        setIsLoading(true);
+        const accountList = await authClient.listAccounts();
 
-            setProviderList(
-                accountList.data?.map(account =>
-                    account.providerId.toLowerCase(),
-                ) ?? [],
-            );
-            setIsLoading(false);
-        })();
+        setProviderList(
+            accountList.data?.map(account =>
+                account.providerId.toLowerCase(),
+            ) ?? [],
+        );
+        setIsLoading(false);
     }, []);
+
+    useEffect(() => {
+        loadProviders();
+    }, [loadProviders]);
 
     const linkGithub = async (link: boolean) => {
         if (link) {
@@ -39,6 +42,8 @@ function DashboardLayout() {
                 providerId: "github",
             });
         }
+
+        await loadProviders();
     };
 
     const linkDiscord = async (link: boolean) => {
@@ -52,6 +57,8 @@ function DashboardLayout() {
                 providerId: "discord",
             });
         }
+
+        await loadProviders();
     };
 
     const linkRailway = async (link: boolean) => {
@@ -65,6 +72,8 @@ function DashboardLayout() {
                 providerId: "railway",
             });
         }
+
+        await loadProviders();
     };
 
     const deleteAccount = async () => {
@@ -130,7 +139,11 @@ function DashboardLayout() {
                         >
                             <AnimatePresence mode="wait" initial={false}>
                                 <motion.span
-                                    key={deleteConfirmation ? "confirm" : "delete"}
+                                    key={
+                                        deleteConfirmation
+                                            ? "confirm"
+                                            : "delete"
+                                    }
                                     initial={{ rotateX: -90, opacity: 0 }}
                                     animate={{ rotateX: 0, opacity: 1 }}
                                     exit={{ rotateX: 90, opacity: 0 }}
