@@ -14,6 +14,12 @@ export const Route = createFileRoute("/api/health/")({
                             null,
                         ),
                     ),
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        status: 200,
+                    },
                 );
             },
         },
