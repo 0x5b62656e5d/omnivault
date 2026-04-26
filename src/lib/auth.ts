@@ -7,6 +7,13 @@ import { env } from "@/env/server";
 export const auth = betterAuth({
     baseUrl: env.BASE_URL,
     secret: env.BETTER_AUTH_SECRET,
+    account: {
+        accountLinking: {
+            allowDifferentEmails: true,
+            updateUserInfoOnLink: true,
+            trustedProviders: ["discord", "github", "railway"],
+        },
+    },
     database: drizzleAdapter(db, {
         provider: "pg",
     }),
@@ -21,6 +28,10 @@ export const auth = betterAuth({
         github: {
             clientId: env.GITHUB_CLIENT_ID,
             clientSecret: env.GITHUB_CLIENT_SECRET,
+        },
+        railway: {
+            clientId: env.RAILWAY_CLIENT_ID,
+            clientSecret: env.RAILWAY_CLIENT_SECRET,
         },
     },
     plugins: [tanstackStartCookies()],

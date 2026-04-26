@@ -13,6 +13,8 @@ export const env = createEnv({
         DISCORD_CLIENT_SECRET: z.string(),
         GITHUB_CLIENT_ID: z.string(),
         GITHUB_CLIENT_SECRET: z.string(),
+        RAILWAY_CLIENT_ID: z.string(),
+        RAILWAY_CLIENT_SECRET: z.string(),
         BETTER_AUTH_SECRET: z.string(),
     },
     runtimeEnv: process.env,
