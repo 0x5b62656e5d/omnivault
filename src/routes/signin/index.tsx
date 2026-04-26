@@ -4,8 +4,8 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 import { FieldInfo } from "@/components/fieldInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
 import { getSession } from "@/lib/auth.functions";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/signin/")({
     beforeLoad: async ({ location }) => {
