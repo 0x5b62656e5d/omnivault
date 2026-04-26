@@ -122,11 +122,30 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <body>
                 <header className="flex justify-between items-center p-4">
                     <div className="flex gap-1">
-                        <h1>
-                            <a href="/">Dashboard</a>
-                        </h1>
+                        <nav className="flex gap-4 items-center">
+                            <p
+                                onClick={() =>
+                                    navigate({
+                                        to: "/",
+                                    })
+                                }
+                                className="hover:cursor-pointer"
+                            >
+                                Dashboard
+                            </p>
+                            <p
+                                onClick={() =>
+                                    navigate({
+                                        to: "/about",
+                                    })
+                                }
+                                className="hover:cursor-pointer"
+                            >
+                                About
+                            </p>
+                        </nav>
                     </div>
-                    <div className="flex gap-1">
+                    <nav className="flex gap-1">
                         {user ? (
                             <div ref={menuRef} className="relative">
                                 <div
@@ -178,7 +197,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 Sign in
                             </Button>
                         )}
-                    </div>
+                    </nav>
                 </header>
                 {children}
                 <TanStackDevtools
