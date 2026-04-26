@@ -1,0 +1,1 @@
+ALTER TABLE "s3credentials" ADD COLUMN "name" text NOT NULL;

@@ -14,6 +14,7 @@ export const s3credentials = pgTable("s3credentials", {
     id: text("id")
         .primaryKey()
         .$defaultFn(() => createId()),
+    name: text().notNull(),
     accessKeyId: text().notNull(),
     secretAccessKey: text().notNull(),
     endpointUrl: text(),
@@ -53,9 +54,7 @@ export const multipartUploads = pgTable(
         key: text().notNull(),
         initiatedAt: timestamp("initiated_at").defaultNow(),
     },
-    table => ({
-        uploadIdIdx: index("upload_id_idx").on(table.uploadId),
-    }),
+    table => [index("upload_id_idx").on(table.uploadId)],
 );
 
 export const s3credentialsToUserRelations = relations(
