@@ -8,6 +8,7 @@ import {
     useRouter,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { NotFound } from "@/components/notFound";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import { authClient } from "@/lib/auth-client";
 import { opengraphTags, twitterTags } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
-import { AnimatePresence, motion } from "framer-motion";
 
 interface MyRouterContext {
     queryClient: QueryClient;
