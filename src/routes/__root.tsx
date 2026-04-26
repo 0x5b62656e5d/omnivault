@@ -15,6 +15,7 @@ import { authClient } from "@/lib/auth-client";
 import { opengraphTags, twitterTags } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
+import { useState } from "react";
 
 interface MyRouterContext {
     queryClient: QueryClient;
@@ -79,6 +80,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
     const router = useRouter();
     const { user } = Route.useLoaderData();
+    const [showSignout, setShowSignout] = useState(true);
+
+    const toggleSignout = () => {
+        setShowSignout(!showSignout);
+    };
 
     const handleSignout = async () => {
         await authClient.signOut();
@@ -104,9 +110,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     </div>
                     <div className="flex gap-1">
                         {user ? (
-                            <Button type="button" onClick={handleSignout}>
-                                Sign out
-                            </Button>
+                            <div className="relative">
+                                <div onClick={toggleSignout} className="hover:cursor-pointer flex flex-col justify-start items-center">
+                                    <p className="text-sm">Logged in as</p>
+                                    <div className="flex gap-1 items-center">
+                                        <img
+                                            src={user.image || ""}
+                                            alt={user.name}
+                                            className="rounded-full size-12"
+                                        />
+                                        <p className="text-lg">{user.name}</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    type="button"
+                                    onClick={handleSignout}
+                                    hidden={showSignout}
+                                    className="absolute right-0 top-full mt-2"
+                                >
+                                    Sign out
+                                </Button>
+                            </div>
                         ) : (
                             <Button type="button" onClick={handleSignin}>
                                 Sign in

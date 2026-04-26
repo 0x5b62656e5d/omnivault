@@ -1,12 +1,23 @@
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { FieldInfo } from "@/components/fieldInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/signin/")({
+    beforeLoad: async ({ location }) => {
+        const session = await getSession();
+
+        if (session) {
+            redirect({
+                to: "/",
+                search: { redirect: location.href },
+            });
+        }
+    },
     component: RouteComponent,
 });
 
@@ -31,7 +42,7 @@ function RouteComponent() {
 
         await authClient.signIn.social({
             provider: "github",
-            callbackURL: "/dashboard",
+            callbackURL: "/",
         });
     };
 
@@ -42,7 +53,7 @@ function RouteComponent() {
 
         await authClient.signIn.social({
             provider: "discord",
-            callbackURL: "/dashboard",
+            callbackURL: "/",
         });
     };
 
