@@ -16,9 +16,16 @@ import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as ApiHealthIndexRouteImport } from './routes/api/health/index'
 import { Route as ProtectedAccountIndexRouteImport } from './routes/_protected/account/index'
+import { Route as ProtectedProviderIdIndexRouteImport } from './routes/_protected/$providerId/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiS3FilesIndexRouteImport } from './routes/api/s3/files/index'
+import { Route as ApiS3CredentialIndexRouteImport } from './routes/api/s3/credential/index'
+import { Route as ApiS3BucketsIndexRouteImport } from './routes/api/s3/buckets/index'
 import { Route as ApiS3AccountsIndexRouteImport } from './routes/api/s3/accounts/index'
 import { Route as ProtectedAccountManageS3IndexRouteImport } from './routes/_protected/account/manage-s3/index'
+import { Route as ProtectedProviderIdBucketIdIndexRouteImport } from './routes/_protected/$providerId/$bucketId/index'
+import { Route as ApiS3FilesDownloadIndexRouteImport } from './routes/api/s3/files/download/index'
+import { Route as ApiS3BucketsRefetchIndexRouteImport } from './routes/api/s3/buckets/refetch/index'
 
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
@@ -54,9 +61,30 @@ const ProtectedAccountIndexRoute = ProtectedAccountIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedAccountRoute,
 } as any)
+const ProtectedProviderIdIndexRoute =
+  ProtectedProviderIdIndexRouteImport.update({
+    id: '/$providerId/',
+    path: '/$providerId/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiS3FilesIndexRoute = ApiS3FilesIndexRouteImport.update({
+  id: '/api/s3/files/',
+  path: '/api/s3/files/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiS3CredentialIndexRoute = ApiS3CredentialIndexRouteImport.update({
+  id: '/api/s3/credential/',
+  path: '/api/s3/credential/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiS3BucketsIndexRoute = ApiS3BucketsIndexRouteImport.update({
+  id: '/api/s3/buckets/',
+  path: '/api/s3/buckets/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiS3AccountsIndexRoute = ApiS3AccountsIndexRouteImport.update({
@@ -70,6 +98,23 @@ const ProtectedAccountManageS3IndexRoute =
     path: '/manage-s3/',
     getParentRoute: () => ProtectedAccountRoute,
   } as any)
+const ProtectedProviderIdBucketIdIndexRoute =
+  ProtectedProviderIdBucketIdIndexRouteImport.update({
+    id: '/$providerId/$bucketId/',
+    path: '/$providerId/$bucketId/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ApiS3FilesDownloadIndexRoute = ApiS3FilesDownloadIndexRouteImport.update({
+  id: '/api/s3/files/download/',
+  path: '/api/s3/files/download/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiS3BucketsRefetchIndexRoute =
+  ApiS3BucketsRefetchIndexRouteImport.update({
+    id: '/api/s3/buckets/refetch/',
+    path: '/api/s3/buckets/refetch/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
@@ -77,20 +122,34 @@ export interface FileRoutesByFullPath {
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$providerId/': typeof ProtectedProviderIdIndexRoute
   '/account/': typeof ProtectedAccountIndexRoute
   '/api/health/': typeof ApiHealthIndexRoute
+  '/$providerId/$bucketId/': typeof ProtectedProviderIdBucketIdIndexRoute
   '/account/manage-s3/': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts/': typeof ApiS3AccountsIndexRoute
+  '/api/s3/buckets/': typeof ApiS3BucketsIndexRoute
+  '/api/s3/credential/': typeof ApiS3CredentialIndexRoute
+  '/api/s3/files/': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
+  '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof ProtectedIndexRoute
   '/about': typeof AboutIndexRoute
   '/signin': typeof SigninIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$providerId': typeof ProtectedProviderIdIndexRoute
   '/account': typeof ProtectedAccountIndexRoute
   '/api/health': typeof ApiHealthIndexRoute
+  '/$providerId/$bucketId': typeof ProtectedProviderIdBucketIdIndexRoute
   '/account/manage-s3': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts': typeof ApiS3AccountsIndexRoute
+  '/api/s3/buckets': typeof ApiS3BucketsIndexRoute
+  '/api/s3/credential': typeof ApiS3CredentialIndexRoute
+  '/api/s3/files': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/refetch': typeof ApiS3BucketsRefetchIndexRoute
+  '/api/s3/files/download': typeof ApiS3FilesDownloadIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -100,10 +159,17 @@ export interface FileRoutesById {
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_protected/$providerId/': typeof ProtectedProviderIdIndexRoute
   '/_protected/account/': typeof ProtectedAccountIndexRoute
   '/api/health/': typeof ApiHealthIndexRoute
+  '/_protected/$providerId/$bucketId/': typeof ProtectedProviderIdBucketIdIndexRoute
   '/_protected/account/manage-s3/': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts/': typeof ApiS3AccountsIndexRoute
+  '/api/s3/buckets/': typeof ApiS3BucketsIndexRoute
+  '/api/s3/credential/': typeof ApiS3CredentialIndexRoute
+  '/api/s3/files/': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
+  '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -113,20 +179,34 @@ export interface FileRouteTypes {
     | '/about/'
     | '/signin/'
     | '/api/auth/$'
+    | '/$providerId/'
     | '/account/'
     | '/api/health/'
+    | '/$providerId/$bucketId/'
     | '/account/manage-s3/'
     | '/api/s3/accounts/'
+    | '/api/s3/buckets/'
+    | '/api/s3/credential/'
+    | '/api/s3/files/'
+    | '/api/s3/buckets/refetch/'
+    | '/api/s3/files/download/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/signin'
     | '/api/auth/$'
+    | '/$providerId'
     | '/account'
     | '/api/health'
+    | '/$providerId/$bucketId'
     | '/account/manage-s3'
     | '/api/s3/accounts'
+    | '/api/s3/buckets'
+    | '/api/s3/credential'
+    | '/api/s3/files'
+    | '/api/s3/buckets/refetch'
+    | '/api/s3/files/download'
   id:
     | '__root__'
     | '/_protected'
@@ -135,10 +215,17 @@ export interface FileRouteTypes {
     | '/about/'
     | '/signin/'
     | '/api/auth/$'
+    | '/_protected/$providerId/'
     | '/_protected/account/'
     | '/api/health/'
+    | '/_protected/$providerId/$bucketId/'
     | '/_protected/account/manage-s3/'
     | '/api/s3/accounts/'
+    | '/api/s3/buckets/'
+    | '/api/s3/credential/'
+    | '/api/s3/files/'
+    | '/api/s3/buckets/refetch/'
+    | '/api/s3/files/download/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,6 +235,11 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiHealthIndexRoute: typeof ApiHealthIndexRoute
   ApiS3AccountsIndexRoute: typeof ApiS3AccountsIndexRoute
+  ApiS3BucketsIndexRoute: typeof ApiS3BucketsIndexRoute
+  ApiS3CredentialIndexRoute: typeof ApiS3CredentialIndexRoute
+  ApiS3FilesIndexRoute: typeof ApiS3FilesIndexRoute
+  ApiS3BucketsRefetchIndexRoute: typeof ApiS3BucketsRefetchIndexRoute
+  ApiS3FilesDownloadIndexRoute: typeof ApiS3FilesDownloadIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -201,11 +293,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAccountIndexRouteImport
       parentRoute: typeof ProtectedAccountRoute
     }
+    '/_protected/$providerId/': {
+      id: '/_protected/$providerId/'
+      path: '/$providerId'
+      fullPath: '/$providerId/'
+      preLoaderRoute: typeof ProtectedProviderIdIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/s3/files/': {
+      id: '/api/s3/files/'
+      path: '/api/s3/files'
+      fullPath: '/api/s3/files/'
+      preLoaderRoute: typeof ApiS3FilesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/s3/credential/': {
+      id: '/api/s3/credential/'
+      path: '/api/s3/credential'
+      fullPath: '/api/s3/credential/'
+      preLoaderRoute: typeof ApiS3CredentialIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/s3/buckets/': {
+      id: '/api/s3/buckets/'
+      path: '/api/s3/buckets'
+      fullPath: '/api/s3/buckets/'
+      preLoaderRoute: typeof ApiS3BucketsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/s3/accounts/': {
@@ -221,6 +341,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/manage-s3/'
       preLoaderRoute: typeof ProtectedAccountManageS3IndexRouteImport
       parentRoute: typeof ProtectedAccountRoute
+    }
+    '/_protected/$providerId/$bucketId/': {
+      id: '/_protected/$providerId/$bucketId/'
+      path: '/$providerId/$bucketId'
+      fullPath: '/$providerId/$bucketId/'
+      preLoaderRoute: typeof ProtectedProviderIdBucketIdIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/api/s3/files/download/': {
+      id: '/api/s3/files/download/'
+      path: '/api/s3/files/download'
+      fullPath: '/api/s3/files/download/'
+      preLoaderRoute: typeof ApiS3FilesDownloadIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/s3/buckets/refetch/': {
+      id: '/api/s3/buckets/refetch/'
+      path: '/api/s3/buckets/refetch'
+      fullPath: '/api/s3/buckets/refetch/'
+      preLoaderRoute: typeof ApiS3BucketsRefetchIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -241,11 +382,15 @@ const ProtectedAccountRouteWithChildren =
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedProviderIdIndexRoute: typeof ProtectedProviderIdIndexRoute
+  ProtectedProviderIdBucketIdIndexRoute: typeof ProtectedProviderIdBucketIdIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
+  ProtectedProviderIdIndexRoute: ProtectedProviderIdIndexRoute,
+  ProtectedProviderIdBucketIdIndexRoute: ProtectedProviderIdBucketIdIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -259,6 +404,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiHealthIndexRoute: ApiHealthIndexRoute,
   ApiS3AccountsIndexRoute: ApiS3AccountsIndexRoute,
+  ApiS3BucketsIndexRoute: ApiS3BucketsIndexRoute,
+  ApiS3CredentialIndexRoute: ApiS3CredentialIndexRoute,
+  ApiS3FilesIndexRoute: ApiS3FilesIndexRoute,
+  ApiS3BucketsRefetchIndexRoute: ApiS3BucketsRefetchIndexRoute,
+  ApiS3FilesDownloadIndexRoute: ApiS3FilesDownloadIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
