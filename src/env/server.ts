@@ -5,6 +5,7 @@ export const env = createEnv({
     server: {
         DATABASE_URL: z.url(),
         ENCRYPTION_KEY: z.string(),
+        HMAC_KEY: z.string(),
         ENCRYPTION_METHOD: z.string(),
         IV_LENGTH: z.coerce.number(),
         KDF_SALT: z.string(),

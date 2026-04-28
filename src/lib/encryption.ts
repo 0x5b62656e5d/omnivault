@@ -30,3 +30,10 @@ export const decrypt = (input: string): string => {
         decipher.update(encryptedText, "hex", "utf8") + decipher.final("utf8")
     );
 };
+
+export const hmacHash = (input: string): string => {
+    return crypto
+        .createHmac("sha256", env.HMAC_KEY)
+        .update(input)
+        .digest("hex");
+}
