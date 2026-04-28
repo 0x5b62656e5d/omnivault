@@ -82,10 +82,9 @@ function DashboardLayout() {
             return;
         }
 
-        console.log("deleting!!!");
-        // await authClient.deleteUser({
-        //     callbackURL: "/signin",
-        // });
+        await authClient.deleteUser({
+            callbackURL: "/signin",
+        });
     };
 
     return (
