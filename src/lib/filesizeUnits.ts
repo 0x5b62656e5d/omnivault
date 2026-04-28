@@ -9,4 +9,4 @@ export const getFileSizeUnits = (bytes: number) => {
     }
 
     return `${size.toFixed(1)} ${units[unitIndex]}`;
-}
+};

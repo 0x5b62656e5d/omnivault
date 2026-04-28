@@ -1,13 +1,13 @@
+import type { _Object, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { InferSelectModel } from "drizzle-orm";
-import { useState } from "react";
-import type { s3buckets } from "@/db/schema";
-import type { _Object, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
-import { Button } from "@/components/ui/button";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { account } from "@/db/auth-schema";
 import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { account } from "@/db/auth-schema";
+import type { s3buckets } from "@/db/schema";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({

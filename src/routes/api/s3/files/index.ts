@@ -1,12 +1,16 @@
+import {
+    DeleteObjectCommand,
+    ListObjectsV2Command,
+    RenameObjectCommand,
+} from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3buckets, s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
-import { createStandardResponse } from "@/lib/utils";
-import { createClient } from "@/lib/s3/client";
 import { decrypt } from "@/lib/encryption";
-import { DeleteObjectCommand, ListObjectsV2Command, RenameObjectCommand } from "@aws-sdk/client-s3";
+import { createClient } from "@/lib/s3/client";
+import { createStandardResponse } from "@/lib/utils";
 
 export const Route = createFileRoute("/api/s3/files/")({
     server: {
