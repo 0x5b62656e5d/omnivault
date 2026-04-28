@@ -1,9 +1,11 @@
+import { S3ServiceException } from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
-import { encrypt } from "@/lib/encryption";
+import { encrypt, hmacHash } from "@/lib/encryption";
+import { loadBucketRegions, loadBuckets } from "@/lib/s3/buckets";
 import { createStandardResponse } from "@/lib/utils";
 
 export const Route = createFileRoute("/api/s3/accounts/")({
@@ -75,13 +77,81 @@ export const Route = createFileRoute("/api/s3/accounts/")({
                 const { name, accessKeyId, secretAccessKey, endpointUrl } =
                     body;
 
-                await db.insert(s3credentials).values({
-                    name,
-                    accessKeyId: encrypt(accessKeyId),
-                    secretAccessKey: encrypt(secretAccessKey),
-                    endpointUrl,
-                    ownedBy: session.user.id,
-                });
+                await db
+                    .insert(s3credentials)
+                    .values({
+                        name,
+                        accessKeyId: encrypt(accessKeyId),
+                        secretAccessKey: encrypt(secretAccessKey),
+                        endpointUrl,
+                        accessKeyIdHash: hmacHash(accessKeyId),
+                        ownedBy: session.user.id,
+                    })
+                    .onConflictDoNothing();
+
+                try {
+                    const buckets = await loadBuckets("auto", {
+                        accessKeyId,
+                        secretAccessKey,
+                        endpointUrl,
+                    });
+
+                    const bucketNames =
+                        buckets.Buckets?.map(bucket => bucket.Name || "") || [];
+
+                    if (bucketNames) {
+                        await loadBucketRegions(
+                            session.user.id,
+                            {
+                                accessKeyId,
+                                secretAccessKey,
+                                endpointUrl,
+                            },
+                            ...bucketNames,
+                        );
+                    }
+                } catch (error) {
+                    if (error instanceof S3ServiceException) {
+                        return new Response(
+                            JSON.stringify(
+                                createStandardResponse(
+                                    false,
+                                    null,
+                                    "Invalid S3 credentials",
+                                    null,
+                                ),
+                            ),
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                status: error.$metadata.httpStatusCode || 400,
+                            },
+                        );
+                    } else {
+                        console.error(
+                            "Error validating S3 credentials:",
+                            error,
+                        );
+
+                        return new Response(
+                            JSON.stringify(
+                                createStandardResponse(
+                                    false,
+                                    null,
+                                    "Invalid S3 credentials",
+                                    null,
+                                ),
+                            ),
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                status: 400,
+                            },
+                        );
+                    }
+                }
 
                 return new Response(null, {
                     headers: {

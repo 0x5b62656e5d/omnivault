@@ -20,6 +20,7 @@ function RouteComponent() {
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<
         string | null
     >(null);
+    const [errorMsg, setErrormsg] = useState<string | null>(null);
 
     const form = useForm({
         defaultValues: {
@@ -30,6 +31,7 @@ function RouteComponent() {
         },
         onSubmit: async ({ value }) => {
             setShowAddAccountForm(false);
+            setErrormsg(null);
 
             const res = await fetch("/api/s3/accounts", {
                 method: "POST",
@@ -39,11 +41,14 @@ function RouteComponent() {
                 body: JSON.stringify(value),
             });
 
+            form.reset();
+
             if (!res.ok) {
                 console.error("S3 account mgmt error 101");
+                setErrormsg("Failed to add S3 account - Err 101");
+                return;
             }
 
-            form.reset();
             queryClient.invalidateQueries({
                 queryKey: ["s3-accounts"],
             });
@@ -53,15 +58,18 @@ function RouteComponent() {
     const { data, isLoading, error, isError } = useQuery({
         queryKey: ["s3-accounts"],
         queryFn: async () => {
+            setErrormsg(null);
             const res = await fetch("/api/s3/accounts");
 
             if (!res.ok) {
+                setErrormsg("Failed to fetch S3 accounts - Err 102");
                 throw new Error("S3 account mgmt error 102");
             }
 
             const json = await res.json();
 
             if (!json.success) {
+                setErrormsg("Failed to fetch S3 accounts - Err 103");
                 throw new Error("S3 account mgmt error 103");
             }
 
@@ -86,7 +94,9 @@ function RouteComponent() {
         });
 
         if (!res.ok) {
+            setErrormsg("Failed to delete S3 account - Err 104");
             console.error("S3 account mgmt error 104");
+            return;
         }
 
         queryClient.invalidateQueries({
@@ -107,8 +117,9 @@ function RouteComponent() {
         <main>
             <h1>Manage S3 accounts</h1>
             <div className="flex flex-col justify-center items-center gap-2">
-                {isLoading && <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />}
-                {isError && <p>Error fetching S3 accounts</p>}
+                {isLoading && (
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                )}
                 {data?.map(account => (
                     <div
                         key={account.id}
@@ -151,9 +162,11 @@ function RouteComponent() {
                         </Button>
                     </div>
                 ))}
-                {isError && (
+                {(isError || errorMsg) && (
                     <p className="text-destructive">
-                        {(error as Error).message}
+                        {error
+                            ? (error as Error).message
+                            : errorMsg || "Error fetching S3 accounts"}
                     </p>
                 )}
                 <Button onClick={handleAddAccount}>Add S3 Account</Button>
