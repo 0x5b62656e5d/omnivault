@@ -77,6 +77,23 @@ function RouteComponent() {
         },
     });
 
+    const handleRefetchBuckets = async () => {
+        setErrormsg(null);
+
+        const res = await fetch(`/api/s3/buckets/refetch`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            setErrormsg("Failed to refetch S3 buckets - Err 105");
+            console.error("S3 account mgmt error 105");
+            return;
+        }
+    };
+
     const handleDeleteAccount = async (accountId: string) => {
         if (deleteConfirmationId !== accountId) {
             setDeleteConfirmationId(accountId);
@@ -170,6 +187,11 @@ function RouteComponent() {
                     </p>
                 )}
                 <Button onClick={handleAddAccount}>Add S3 Account</Button>
+                {data && (
+                    <Button onClick={handleRefetchBuckets}>
+                        Refetch S3 buckets
+                    </Button>
+                )}
 
                 <AnimatePresence>
                     {showAddAccountForm && (
