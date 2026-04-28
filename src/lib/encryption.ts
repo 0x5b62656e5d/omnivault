@@ -36,4 +36,4 @@ export const hmacHash = (input: string): string => {
         .createHmac("sha256", env.HMAC_KEY)
         .update(input)
         .digest("hex");
-}
+};
