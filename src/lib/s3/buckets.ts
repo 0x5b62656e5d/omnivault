@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3buckets, s3credentials } from "@/db/schema";
 import type { S3Credential } from "@/lib/types";
-import { encrypt, hmacHash } from "../encryption";
+import { hmacHash } from "../encryption";
 import { createClient } from "./client";
 
 export const loadBuckets = async (
