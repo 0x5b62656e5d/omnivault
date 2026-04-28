@@ -52,14 +52,13 @@ export const loadBucketRegions = async (
             await db
                 .insert(s3buckets)
                 .values({
-                    id: `${userId}#${bucket}`,
                     name: bucket,
                     region: res.BucketRegion || "auto",
                     parentCredential: credentialId[0].id,
                     ownedBy: userId,
                 })
                 .onConflictDoUpdate({
-                    target: [s3buckets.id, s3buckets.parentCredential],
+                    target: [s3buckets.name, s3buckets.parentCredential],
                     set: {
                         region: res.BucketRegion || "auto",
                     },
