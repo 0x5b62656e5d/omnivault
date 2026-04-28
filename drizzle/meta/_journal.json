@@ -15,6 +15,27 @@
       "when": 1777195498504,
       "tag": "0001_broken_sphinx",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777340052229,
+      "tag": "0002_blue_champions",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777340523809,
+      "tag": "0003_slow_anita_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777340985524,
+      "tag": "0004_happy_skreet",
+      "breakpoints": true
     }
   ]
 }

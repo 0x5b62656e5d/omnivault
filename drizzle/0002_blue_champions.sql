@@ -1,0 +1,1 @@
+ALTER TABLE "s3credentials" ADD COLUMN "access_key_id_hash" text NOT NULL;

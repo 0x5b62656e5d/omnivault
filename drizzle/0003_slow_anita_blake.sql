@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "unique_user_access_key" ON "s3credentials" USING btree ("owned_by","access_key_id_hash");

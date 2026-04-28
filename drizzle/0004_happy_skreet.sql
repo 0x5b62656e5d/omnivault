@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "unique_bucket_per_credential" ON "s3buckets" USING btree ("name","parent_credential");
