@@ -46,6 +46,9 @@ export const s3buckets = pgTable(
         parentCredential: text("parent_credential")
             .notNull()
             .references(() => s3credentials.id, { onDelete: "cascade" }),
+        ownedBy: text("owned_by")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
         createdAt: timestamp("created_at").defaultNow(),
     },
     table => [

@@ -56,6 +56,7 @@ export const loadBucketRegions = async (
                     name: bucket,
                     region: res.BucketRegion || "auto",
                     parentCredential: credentialId[0].id,
+                    ownedBy: userId,
                 })
                 .onConflictDoUpdate({
                     target: [s3buckets.id, s3buckets.parentCredential],
