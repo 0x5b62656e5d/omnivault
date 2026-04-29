@@ -26,6 +26,7 @@ import { Route as ProtectedAccountManageS3IndexRouteImport } from './routes/_pro
 import { Route as ProtectedProviderIdBucketIdIndexRouteImport } from './routes/_protected/$providerId/$bucketId/index'
 import { Route as ApiS3FilesDownloadIndexRouteImport } from './routes/api/s3/files/download/index'
 import { Route as ApiS3BucketsRefetchIndexRouteImport } from './routes/api/s3/buckets/refetch/index'
+import { Route as ApiS3BucketsRefetchProviderIdIndexRouteImport } from './routes/api/s3/buckets/refetch/$providerId/index'
 
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
@@ -115,6 +116,12 @@ const ApiS3BucketsRefetchIndexRoute =
     path: '/api/s3/buckets/refetch/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiS3BucketsRefetchProviderIdIndexRoute =
+  ApiS3BucketsRefetchProviderIdIndexRouteImport.update({
+    id: '/api/s3/buckets/refetch/$providerId/',
+    path: '/api/s3/buckets/refetch/$providerId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/api/s3/files/': typeof ApiS3FilesIndexRoute
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
+  '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof ProtectedIndexRoute
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/api/s3/files': typeof ApiS3FilesIndexRoute
   '/api/s3/buckets/refetch': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download': typeof ApiS3FilesDownloadIndexRoute
+  '/api/s3/buckets/refetch/$providerId': typeof ApiS3BucketsRefetchProviderIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -170,6 +179,7 @@ export interface FileRoutesById {
   '/api/s3/files/': typeof ApiS3FilesIndexRoute
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
+  '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/api/s3/files/'
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
+    | '/api/s3/buckets/refetch/$providerId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/api/s3/files'
     | '/api/s3/buckets/refetch'
     | '/api/s3/files/download'
+    | '/api/s3/buckets/refetch/$providerId'
   id:
     | '__root__'
     | '/_protected'
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/api/s3/files/'
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
+    | '/api/s3/buckets/refetch/$providerId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -240,6 +253,7 @@ export interface RootRouteChildren {
   ApiS3FilesIndexRoute: typeof ApiS3FilesIndexRoute
   ApiS3BucketsRefetchIndexRoute: typeof ApiS3BucketsRefetchIndexRoute
   ApiS3FilesDownloadIndexRoute: typeof ApiS3FilesDownloadIndexRoute
+  ApiS3BucketsRefetchProviderIdIndexRoute: typeof ApiS3BucketsRefetchProviderIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -363,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiS3BucketsRefetchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/s3/buckets/refetch/$providerId/': {
+      id: '/api/s3/buckets/refetch/$providerId/'
+      path: '/api/s3/buckets/refetch/$providerId'
+      fullPath: '/api/s3/buckets/refetch/$providerId/'
+      preLoaderRoute: typeof ApiS3BucketsRefetchProviderIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -409,6 +430,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiS3FilesIndexRoute: ApiS3FilesIndexRoute,
   ApiS3BucketsRefetchIndexRoute: ApiS3BucketsRefetchIndexRoute,
   ApiS3FilesDownloadIndexRoute: ApiS3FilesDownloadIndexRoute,
+  ApiS3BucketsRefetchProviderIdIndexRoute:
+    ApiS3BucketsRefetchProviderIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

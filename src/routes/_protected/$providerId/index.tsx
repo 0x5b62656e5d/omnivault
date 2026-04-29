@@ -20,6 +20,7 @@ function RouteComponent() {
     const { user } = Route.useRouteContext();
     const { providerId } = Route.useParams();
     const [providerName, setProviderName] = useState<string | null>(null);
+    const [isRefetching, setIsRefetching] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -100,6 +101,30 @@ function RouteComponent() {
         },
     });
 
+    const handleRefetchBuckets = async () => {
+        setErrormsg(null);
+        setIsRefetching(true);
+
+        const res = await fetch(`/api/s3/buckets/refetch/${providerId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        setIsRefetching(false);
+
+        if (!res.ok) {
+            setErrormsg("Failed to refetch S3 buckets - Err 105");
+            console.error("S3 account mgmt error 105");
+            return;
+        }
+
+        queryClient.invalidateQueries({
+            queryKey: ["s3-buckets", providerId],
+        });
+    };
+
     const handleCreateBucket = () => {
         setShowAddBucketForm(true);
     };
@@ -127,6 +152,13 @@ function RouteComponent() {
             ))}
             {data?.length === 0 && <p>No S3 buckets added yet.</p>}
             <Button onClick={handleCreateBucket}>Create bucket</Button>
+            <Button
+                onClick={handleRefetchBuckets}
+                disabled={isRefetching}
+                className={`${isRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+            >
+                {isRefetching ? "Refetching..." : "Refetch S3 buckets"}
+            </Button>
             <AnimatePresence>
                 {showAddBucketForm && (
                     <motion.div
