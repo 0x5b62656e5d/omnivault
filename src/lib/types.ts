@@ -9,4 +9,5 @@ export interface S3Credential {
     accessKeyId: string;
     secretAccessKey: string;
     endpointUrl?: string;
+    region: string;
 }

@@ -43,6 +43,13 @@
       "when": 1777342863564,
       "tag": "0005_legal_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777372939931,
+      "tag": "0006_volatile_stone_men",
+      "breakpoints": true
     }
   ]
 }

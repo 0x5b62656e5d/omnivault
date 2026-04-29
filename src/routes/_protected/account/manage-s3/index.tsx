@@ -7,6 +7,8 @@ import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import type { s3credentials } from "@/db/schema";
+import { AWS_REGION_LIST } from "@/lib/s3/client";
+import { DeleteButton } from "@/components/deleteButton";
 
 type S3Credential = InferSelectModel<typeof s3credentials>;
 
@@ -28,6 +30,7 @@ function RouteComponent() {
             accessKeyId: "",
             secretAccessKey: "",
             endpointUrl: "",
+            region: "",
         },
         onSubmit: async ({ value }) => {
             setShowAddAccountForm(false);
@@ -404,6 +407,93 @@ function RouteComponent() {
                                                 )}
                                             </label>
                                         )}
+                                    </form.Field>
+
+                                    <form.Field
+                                        name="region"
+                                        validators={{
+                                            onChange: ({ value, fieldApi }) => {
+                                                const endpoint =
+                                                    fieldApi.form.getFieldValue(
+                                                        "endpointUrl",
+                                                    );
+
+                                                if (endpoint?.trim()) {
+                                                    return undefined;
+                                                }
+
+                                                if (!value?.trim()) {
+                                                    return "Region is required for AWS S3";
+                                                }
+
+                                                return undefined;
+                                            },
+                                        }}
+                                    >
+                                        {field => {
+                                            const endpoint =
+                                                form.getFieldValue(
+                                                    "endpointUrl",
+                                                );
+                                            const shouldShow =
+                                                !endpoint?.trim();
+
+                                            if (!shouldShow) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <label className="flex flex-col gap-1">
+                                                    <span className="text-sm font-medium">
+                                                        AWS Region
+                                                        <span className="ml-1 text-muted-foreground">
+                                                            (Required for AWS)
+                                                        </span>
+                                                    </span>
+
+                                                    <select
+                                                        value={
+                                                            field.state.value
+                                                        }
+                                                        onBlur={
+                                                            field.handleBlur
+                                                        }
+                                                        onChange={event => {
+                                                            field.handleChange(
+                                                                event.target
+                                                                    .value,
+                                                            );
+                                                        }}
+                                                        className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                                    >
+                                                        <option value="">
+                                                            Select a region
+                                                        </option>
+                                                        {AWS_REGION_LIST.map(
+                                                            region => (
+                                                                <option
+                                                                    key={region}
+                                                                    value={
+                                                                        region
+                                                                    }
+                                                                >
+                                                                    {region}
+                                                                </option>
+                                                            ),
+                                                        )}
+                                                    </select>
+
+                                                    {field.state.meta.errors
+                                                        .length > 0 && (
+                                                        <span className="text-sm text-destructive">
+                                                            {field.state.meta.errors.join(
+                                                                ", ",
+                                                            )}
+                                                        </span>
+                                                    )}
+                                                </label>
+                                            );
+                                        }}
                                     </form.Field>
 
                                     <div className="mt-2 flex justify-end gap-2">

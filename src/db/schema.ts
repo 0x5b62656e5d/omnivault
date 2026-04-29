@@ -22,6 +22,7 @@ export const s3credentials = pgTable(
         secretAccessKey: text().notNull(),
         endpointUrl: text(),
         accessKeyIdHash: text("access_key_id_hash").notNull(),
+        region: text().notNull(),
         ownedBy: text("owned_by")
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),

@@ -105,6 +105,7 @@ export const Route = createFileRoute("/api/s3/files/")({
                             row.credential.secretAccessKey,
                         ),
                         endpointUrl: row.credential.endpointUrl || undefined,
+                        region: row.credential.region,
                     });
 
                     const res = await client.send(
@@ -240,6 +241,7 @@ export const Route = createFileRoute("/api/s3/files/")({
                             row.credential.secretAccessKey,
                         ),
                         endpointUrl: row.credential.endpointUrl || undefined,
+                        region: row.credential.region,
                     });
 
                     await client.send(

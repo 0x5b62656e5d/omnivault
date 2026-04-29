@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth.functions";
 import { encrypt, hmacHash } from "@/lib/encryption";
 import { loadBucketRegions, loadBuckets } from "@/lib/s3/buckets";
 import { createStandardResponse } from "@/lib/utils";
+import { getRegion } from "@/lib/s3/client";
 
 export const Route = createFileRoute("/api/s3/accounts/")({
     server: {
@@ -74,8 +75,34 @@ export const Route = createFileRoute("/api/s3/accounts/")({
 
                 const body = await request.json();
 
-                const { name, accessKeyId, secretAccessKey, endpointUrl } =
-                    body;
+                const {
+                    name,
+                    accessKeyId,
+                    secretAccessKey,
+                    endpointUrl,
+                    region,
+                } = body;
+
+                if (!name || !accessKeyId || !secretAccessKey) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Missing required fields",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 400,
+                        },
+                    );
+                }
+
+                const parsedRegion = region || getRegion(endpointUrl) || "auto";
 
                 await db
                     .insert(s3credentials)
@@ -85,15 +112,17 @@ export const Route = createFileRoute("/api/s3/accounts/")({
                         secretAccessKey: encrypt(secretAccessKey),
                         endpointUrl,
                         accessKeyIdHash: hmacHash(accessKeyId),
+                        region: parsedRegion,
                         ownedBy: session.user.id,
                     })
                     .onConflictDoNothing();
 
                 try {
-                    const buckets = await loadBuckets("auto", {
+                    const buckets = await loadBuckets(parsedRegion, {
                         accessKeyId,
                         secretAccessKey,
                         endpointUrl,
+                        region: parsedRegion,
                     });
 
                     const bucketNames =
@@ -106,6 +135,7 @@ export const Route = createFileRoute("/api/s3/accounts/")({
                                 accessKeyId,
                                 secretAccessKey,
                                 endpointUrl,
+                                region: parsedRegion,
                             },
                             ...bucketNames,
                         );

@@ -26,7 +26,7 @@ export const loadBucketRegions = async (
     s3credential: S3Credential,
     ...buckets: string[]
 ) => {
-    const client = createClient("auto", s3credential);
+    const client = createClient(s3credential.region, s3credential);
     const credentialId = await db
         .select()
         .from(s3credentials)

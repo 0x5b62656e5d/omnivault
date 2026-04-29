@@ -133,10 +133,11 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     )
                     .limit(1);
 
-                const client = createClient("auto", {
+                const client = createClient(row.region, {
                     accessKeyId: decrypt(row.accessKeyId),
                     secretAccessKey: decrypt(row.secretAccessKey),
                     endpointUrl: row.endpointUrl || undefined,
+                    region: row.region,
                 });
 
                 await client.send(
@@ -150,6 +151,7 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     {
                         accessKeyId: decrypt(row.accessKeyId),
                         secretAccessKey: decrypt(row.secretAccessKey),
+                        region: row.region,
                     },
                     bucketName,
                 );
