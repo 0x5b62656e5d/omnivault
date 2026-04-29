@@ -1,4 +1,3 @@
-import type { ListBucketsCommandOutput } from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -39,57 +38,30 @@ export const Route = createFileRoute("/api/s3/buckets/refetch/")({
                     .where(eq(s3credentials.ownedBy, session.user.id));
 
                 for (const credential of res) {
-                    let buckets: ListBucketsCommandOutput;
-
-                    if (credential.endpointUrl) {
-                        buckets = await loadBuckets("auto", {
-                            accessKeyId: decrypt(credential.accessKeyId),
-                            secretAccessKey: decrypt(
-                                credential.secretAccessKey,
-                            ),
-                            endpointUrl: credential.endpointUrl,
-                        });
-                    } else {
-                        buckets = await loadBuckets("auto", {
-                            accessKeyId: decrypt(credential.accessKeyId),
-                            secretAccessKey: decrypt(
-                                credential.secretAccessKey,
-                            ),
-                        });
-                    }
+                    const buckets = await loadBuckets(credential.region, {
+                        accessKeyId: decrypt(credential.accessKeyId),
+                        secretAccessKey: decrypt(credential.secretAccessKey),
+                        endpointUrl: credential.endpointUrl || undefined,
+                        region: credential.region,
+                    });
 
                     const bucketNames =
                         buckets.Buckets?.map(bucket => bucket.Name || "") || [];
 
                     if (bucketNames) {
-                        if (credential.endpointUrl) {
-                            await loadBucketRegions(
-                                session.user.id,
-                                {
-                                    accessKeyId: decrypt(
-                                        credential.accessKeyId,
-                                    ),
-                                    secretAccessKey: decrypt(
-                                        credential.secretAccessKey,
-                                    ),
-                                    endpointUrl: credential.endpointUrl,
-                                },
-                                ...bucketNames,
-                            );
-                        } else {
-                            await loadBucketRegions(
-                                session.user.id,
-                                {
-                                    accessKeyId: decrypt(
-                                        credential.accessKeyId,
-                                    ),
-                                    secretAccessKey: decrypt(
-                                        credential.secretAccessKey,
-                                    ),
-                                },
-                                ...bucketNames,
-                            );
-                        }
+                        await loadBucketRegions(
+                            session.user.id,
+                            {
+                                accessKeyId: decrypt(credential.accessKeyId),
+                                secretAccessKey: decrypt(
+                                    credential.secretAccessKey,
+                                ),
+                                endpointUrl:
+                                    credential.endpointUrl || undefined,
+                                region: credential.region,
+                            },
+                            ...bucketNames,
+                        );
                     }
                 }
 
