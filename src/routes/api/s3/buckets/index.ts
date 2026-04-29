@@ -156,17 +156,12 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     bucketName,
                 );
 
-                return new Response(
-                    JSON.stringify(
-                        createStandardResponse(true, null, null, null),
-                    ),
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        status: 204,
+                return new Response(null, {
+                    headers: {
+                        "Content-Type": "application/json",
                     },
-                );
+                    status: 204,
+                });
             },
         },
     },
