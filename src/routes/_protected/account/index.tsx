@@ -5,6 +5,7 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/account/")({
     component: DashboardLayout,
@@ -131,30 +132,13 @@ function DashboardLayout() {
                                 : "Link"}{" "}
                             Railway account
                         </Button>
-                        <Button
-                            variant="destructive"
+                        <DeleteButton
                             onClick={deleteAccount}
-                            className="min-w-48 overflow-hidden"
-                        >
-                            <AnimatePresence mode="wait" initial={false}>
-                                <motion.span
-                                    key={
-                                        deleteConfirmation
-                                            ? "confirm"
-                                            : "delete"
-                                    }
-                                    initial={{ rotateX: -90, opacity: 0 }}
-                                    animate={{ rotateX: 0, opacity: 1 }}
-                                    exit={{ rotateX: 90, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="inline-block"
-                                >
-                                    {deleteConfirmation
-                                        ? "Click again to confirm"
-                                        : "Delete account"}
-                                </motion.span>
-                            </AnimatePresence>
-                        </Button>
+                            deleteConfirmationId={
+                                deleteConfirmation ? "account" : null
+                            }
+                            idMatcher={"account"}
+                        />
                     </>
                 )}
             </div>

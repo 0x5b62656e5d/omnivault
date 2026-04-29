@@ -156,30 +156,11 @@ function RouteComponent() {
                                   ).toLocaleDateString()
                                 : "Unknown"}
                         </p>
-                        <Button
-                            variant="destructive"
+                        <DeleteButton
                             onClick={() => handleDeleteAccount(account.id)}
-                            className="min-w-48 overflow-hidden"
-                        >
-                            <AnimatePresence mode="wait" initial={false}>
-                                <motion.span
-                                    key={
-                                        deleteConfirmationId === account.id
-                                            ? "confirm"
-                                            : "delete"
-                                    }
-                                    initial={{ rotateX: -90, opacity: 0 }}
-                                    animate={{ rotateX: 0, opacity: 1 }}
-                                    exit={{ rotateX: 90, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="inline-block"
-                                >
-                                    {deleteConfirmationId === account.id
-                                        ? "Click again to confirm"
-                                        : "Delete"}
-                                </motion.span>
-                            </AnimatePresence>
-                        </Button>
+                            deleteConfirmationId={deleteConfirmationId}
+                            idMatcher={account.id}
+                        />
                     </div>
                 ))}
                 {(isError || errorMsg) && (

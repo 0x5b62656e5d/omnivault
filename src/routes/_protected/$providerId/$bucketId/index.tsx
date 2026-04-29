@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { account } from "@/db/auth-schema";
 import type { s3buckets } from "@/db/schema";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
+import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,
@@ -148,32 +149,11 @@ function RouteComponent() {
                         Download
                         {/* </a> */}
                     </Button>
-                    <Button
-                        variant="destructive"
+                    <DeleteButton
                         onClick={() => deleteFile(file.Key || "")}
-                        className="min-w-48 overflow-hidden"
-                        key={`${idx}-Delete`}
-                        type="button"
-                    >
-                        <AnimatePresence mode="wait" initial={false}>
-                            <motion.span
-                                key={
-                                    deleteConfirmationId === file.Key
-                                        ? "confirm"
-                                        : "delete"
-                                }
-                                initial={{ rotateX: -90, opacity: 0 }}
-                                animate={{ rotateX: 0, opacity: 1 }}
-                                exit={{ rotateX: 90, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="inline-block"
-                            >
-                                {deleteConfirmationId === file.Key
-                                    ? "Click again to confirm"
-                                    : "Delete"}
-                            </motion.span>
-                        </AnimatePresence>
-                    </Button>
+                        deleteConfirmationId={deleteConfirmationId}
+                        idMatcher={file.Key || ""}
+                    />
                 </div>
             ))}
             {data?.length === 0 && <p>No files found in this bucket.</p>}
