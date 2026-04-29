@@ -105,6 +105,7 @@ export const Route = createFileRoute("/api/s3/files/download/")({
                             ),
                             endpointUrl:
                                 row.credential.endpointUrl || undefined,
+                            region: row.credential.region,
                         }),
                         new GetObjectCommand({
                             Bucket: row.bucket.name,
