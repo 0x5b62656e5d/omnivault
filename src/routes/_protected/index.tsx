@@ -10,25 +10,24 @@ export const Route = createFileRoute("/_protected/")({
 });
 
 function DashboardLayout() {
-    const [_errorMsg, setErrormsg] = useState<string | null>(null);
-    const { user } = Route.useRouteContext();
+    const [errorMsg, setErrormsg] = useState<string | null>(null);
 
-    const { data, isLoading, error, isError } = useQuery({
+    const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-accounts"],
         queryFn: async () => {
             setErrormsg(null);
             const res = await fetch("/api/s3/accounts");
 
             if (!res.ok) {
-                setErrormsg("Failed to fetch S3 accounts - Err 102");
-                throw new Error("S3 account mgmt error 102");
+                setErrormsg("S3 account mgmt error 102");
+                return;
             }
 
             const json = await res.json();
 
             if (!json.success) {
-                setErrormsg("Failed to fetch S3 accounts - Err 103");
-                throw new Error("S3 account mgmt error 103");
+                setErrormsg("S3 account mgmt error 103");
+                return;
             }
 
             return json.data as InferSelectModel<typeof s3credentials>[];
@@ -39,7 +38,7 @@ function DashboardLayout() {
         <>
             <Outlet />
             <nav>
-                {isLoading && (
+                {(isLoading || isRefetching) && (
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
                 )}
                 {data?.map(account => (
@@ -54,6 +53,11 @@ function DashboardLayout() {
                     </Link>
                 ))}
                 {data?.length === 0 && <p>No S3 accounts added yet.</p>}
+                {errorMsg && (
+                    <p className="text-destructive">
+                        {errorMsg || "Error fetching S3 accounts"}
+                    </p>
+                )}
             </nav>
         </>
     );

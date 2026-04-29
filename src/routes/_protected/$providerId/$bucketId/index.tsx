@@ -1,14 +1,9 @@
-import type { _Object, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
+import type { _Object } from "@aws-sdk/client-s3";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import type { InferSelectModel } from "drizzle-orm";
-import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { FaRegTrashAlt } from "react-icons/fa";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
-import { account } from "@/db/auth-schema";
-import type { s3buckets } from "@/db/schema";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
@@ -18,14 +13,12 @@ export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
 function RouteComponent() {
     const { queryClient } = Route.useRouteContext();
     const [errorMsg, setErrormsg] = useState<string | null>(null);
-    const { user } = Route.useRouteContext();
     const { providerId, bucketId } = Route.useParams();
-    const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<
         string | null
     >(null);
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-files", providerId, bucketId],
         queryFn: async () => {
             setErrormsg(null);
@@ -34,15 +27,15 @@ function RouteComponent() {
             );
 
             if (!res.ok) {
-                setErrormsg("Failed to fetch S3 files - Err 102");
-                throw new Error("S3 file mgmt error 102");
+                setErrormsg("S3 file mgmt error 102");
+                return;
             }
 
             const json = await res.json();
 
             if (!json.success) {
-                setErrormsg("Failed to fetch S3 files - Err 103");
-                throw new Error("S3 file mgmt error 103");
+                setErrormsg("S3 file mgmt error 103");
+                return;
             }
 
             const data = json.data as _Object[];
@@ -67,15 +60,15 @@ function RouteComponent() {
         );
 
         if (!res.ok) {
-            setErrormsg("Failed to get presigned URL - Err 202");
-            throw new Error("S3 file mgmt error 202");
+            setErrormsg("S3 file mgmt error 202");
+            return;
         }
 
         const json = await res.json();
 
         if (!json.success) {
-            setErrormsg("Failed to get presigned URL - Err 203");
-            throw new Error("S3 file mgmt error 203");
+            setErrormsg("S3 file mgmt error 203");
+            return;
         }
 
         const a = document.createElement("a");
@@ -108,18 +101,17 @@ function RouteComponent() {
         );
 
         if (!res.ok) {
-            setErrormsg("Failed to delete file - Err 302");
-            throw new Error("S3 file mgmt error 302");
+            setErrormsg("S3 file mgmt error 302");
+            return;
         }
 
         const json = await res.json();
 
         if (!json.success) {
-            setErrormsg("Failed to delete file - Err 303");
-            throw new Error("S3 file mgmt error 303");
+            setErrormsg("S3 file mgmt error 303");
+            return;
         }
 
-        // Optionally, you can refetch the file list here to update the UI
         queryClient.invalidateQueries({
             queryKey: ["s3-files", providerId, bucketId],
         });
@@ -127,7 +119,7 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col gap-4">
-            {isLoading && (
+            {(isLoading || isRefetching) && (
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
             )}
             {data?.map((file, idx) => (
@@ -141,13 +133,7 @@ function RouteComponent() {
                         key={`${idx}-Download`}
                         onClick={() => getPresignedUrl(file.Key || "")}
                     >
-                        {/* <a
-                        href="/$providerId/$bucketId"
-                        params={{ providerId: providerId, bucketId: bucket.id }}
-                        key={bucket.id}
-                    > */}
                         Download
-                        {/* </a> */}
                     </Button>
                     <DeleteButton
                         onClick={() => deleteFile(file.Key || "")}
@@ -157,6 +143,11 @@ function RouteComponent() {
                 </div>
             ))}
             {data?.length === 0 && <p>No files found in this bucket.</p>}
+            {errorMsg && (
+                <p className="text-destructive">
+                    {errorMsg || "Error fetching S3 accounts"}
+                </p>
+            )}
         </div>
     );
 }

@@ -1,8 +1,4 @@
-import {
-    DeleteObjectCommand,
-    ListObjectsV2Command,
-    RenameObjectCommand,
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";

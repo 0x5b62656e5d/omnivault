@@ -23,7 +23,7 @@ function RouteComponent() {
         string | null
     >(null);
     const [errorMsg, setErrormsg] = useState<string | null>(null);
-    const [isRefetching, setIsRefetching] = useState(false);
+    const [isManualRefetching, setIsManualRefetching] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -59,22 +59,22 @@ function RouteComponent() {
         },
     });
 
-    const { data, isLoading, error, isError } = useQuery({
+    const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-accounts"],
         queryFn: async () => {
             setErrormsg(null);
             const res = await fetch("/api/s3/accounts");
 
             if (!res.ok) {
-                setErrormsg("Failed to fetch S3 accounts - Err 102");
-                throw new Error("S3 account mgmt error 102");
+                setErrormsg("S3 account mgmt error 102");
+                return;
             }
 
             const json = await res.json();
 
             if (!json.success) {
-                setErrormsg("Failed to fetch S3 accounts - Err 103");
-                throw new Error("S3 account mgmt error 103");
+                setErrormsg("S3 account mgmt error 103");
+                return;
             }
 
             return json.data as S3Credential[];
@@ -83,7 +83,7 @@ function RouteComponent() {
 
     const handleRefetchBuckets = async () => {
         setErrormsg(null);
-        setIsRefetching(true);
+        setIsManualRefetching(true);
 
         const res = await fetch(`/api/s3/buckets/refetch`, {
             method: "POST",
@@ -92,7 +92,7 @@ function RouteComponent() {
             },
         });
 
-        setIsRefetching(false);
+        setIsManualRefetching(false);
 
         if (!res.ok) {
             setErrormsg("Failed to refetch S3 buckets - Err 105");
@@ -141,7 +141,7 @@ function RouteComponent() {
         <main>
             <h1>Manage S3 accounts</h1>
             <div className="flex flex-col justify-center items-center gap-2">
-                {isLoading && (
+                {(isLoading || isRefetching) && (
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
                 )}
                 {data?.map(account => (
@@ -167,21 +167,21 @@ function RouteComponent() {
                         />
                     </div>
                 ))}
-                {(isError || errorMsg) && (
+                {errorMsg && (
                     <p className="text-destructive">
-                        {error
-                            ? (error as Error).message
-                            : errorMsg || "Error fetching S3 accounts"}
+                        {errorMsg || "Error fetching S3 accounts"}
                     </p>
                 )}
                 <Button onClick={handleAddAccount}>Add S3 Account</Button>
                 {data && (
                     <Button
                         onClick={handleRefetchBuckets}
-                        disabled={isRefetching}
-                        className={`${isRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                        disabled={isManualRefetching}
+                        className={`${isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                     >
-                        {isRefetching ? "Refetching..." : "Refetch S3 buckets"}
+                        {isManualRefetching
+                            ? "Refetching..."
+                            : "Refetch S3 buckets"}
                     </Button>
                 )}
 

@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
-import type { account } from "@/db/auth-schema";
 import type { s3buckets } from "@/db/schema";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
@@ -15,12 +14,11 @@ export const Route = createFileRoute("/_protected/$providerId/")({
 
 function RouteComponent() {
     const { queryClient } = Route.useRouteContext();
-    const [_errorMsg, setErrormsg] = useState<string | null>(null);
+    const [errorMsg, setErrormsg] = useState<string | null>(null);
     const [showAddBucketForm, setShowAddBucketForm] = useState(false);
-    const { user } = Route.useRouteContext();
     const { providerId } = Route.useParams();
     const [providerName, setProviderName] = useState<string | null>(null);
-    const [isRefetching, setIsRefetching] = useState(false);
+    const [isManualRefetching, setIsManualRefetching] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -79,22 +77,22 @@ function RouteComponent() {
         })();
     });
 
-    const { data, isLoading, error, isError } = useQuery({
+    const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-buckets", providerId],
         queryFn: async () => {
             setErrormsg(null);
             const res = await fetch(`/api/s3/buckets?providerId=${providerId}`);
 
             if (!res.ok) {
-                setErrormsg("Failed to fetch S3 buckets - Err 102");
-                throw new Error("S3 bucket mgmt error 102");
+                setErrormsg("S3 bucket mgmt error 102");
+                return;
             }
 
             const json = await res.json();
 
             if (!json.success) {
-                setErrormsg("Failed to fetch S3 buckets - Err 103");
-                throw new Error("S3 bucket mgmt error 103");
+                setErrormsg("S3 bucket mgmt error 103");
+                return;
             }
 
             return json.data as InferSelectModel<typeof s3buckets>[];
@@ -103,7 +101,7 @@ function RouteComponent() {
 
     const handleRefetchBuckets = async () => {
         setErrormsg(null);
-        setIsRefetching(true);
+        setIsManualRefetching(true);
 
         const res = await fetch(`/api/s3/buckets/refetch/${providerId}`, {
             method: "POST",
@@ -112,7 +110,7 @@ function RouteComponent() {
             },
         });
 
-        setIsRefetching(false);
+        setIsManualRefetching(false);
 
         if (!res.ok) {
             setErrormsg("Failed to refetch S3 buckets - Err 105");
@@ -136,7 +134,7 @@ function RouteComponent() {
 
     return (
         <div>
-            {isLoading && (
+            {(isLoading || isRefetching || isManualRefetching) && (
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
             )}
             {data?.map(bucket => (
@@ -151,13 +149,18 @@ function RouteComponent() {
                 </Link>
             ))}
             {data?.length === 0 && <p>No S3 buckets added yet.</p>}
+            {errorMsg && (
+                <p className="text-destructive">
+                    {errorMsg || "Error fetching S3 accounts"}
+                </p>
+            )}
             <Button onClick={handleCreateBucket}>Create bucket</Button>
             <Button
                 onClick={handleRefetchBuckets}
-                disabled={isRefetching}
-                className={`${isRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                disabled={isManualRefetching}
+                className={`${isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
             >
-                {isRefetching ? "Refetching..." : "Refetch S3 buckets"}
+                {isManualRefetching ? "Refetching..." : "Refetch S3 buckets"}
             </Button>
             <AnimatePresence>
                 {showAddBucketForm && (

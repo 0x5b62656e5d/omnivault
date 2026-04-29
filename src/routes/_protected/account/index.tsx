@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
