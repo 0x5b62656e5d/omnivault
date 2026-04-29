@@ -5,10 +5,10 @@ import type { InferSelectModel } from "drizzle-orm";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import type { s3credentials } from "@/db/schema";
 import { AWS_REGION_LIST } from "@/lib/s3/client";
-import { DeleteButton } from "@/components/deleteButton";
 
 type S3Credential = InferSelectModel<typeof s3credentials>;
 

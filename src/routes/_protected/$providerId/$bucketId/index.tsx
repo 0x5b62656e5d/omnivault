@@ -5,11 +5,11 @@ import type { InferSelectModel } from "drizzle-orm";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { account } from "@/db/auth-schema";
 import type { s3buckets } from "@/db/schema";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
-import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,

@@ -6,8 +6,8 @@ import { s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
 import { encrypt, hmacHash } from "@/lib/encryption";
 import { loadBucketRegions, loadBuckets } from "@/lib/s3/buckets";
-import { createStandardResponse } from "@/lib/utils";
 import { getRegion } from "@/lib/s3/client";
+import { createStandardResponse } from "@/lib/utils";
 
 export const Route = createFileRoute("/api/s3/accounts/")({
     server: {
