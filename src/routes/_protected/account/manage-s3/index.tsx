@@ -84,7 +84,7 @@ function RouteComponent() {
         setErrormsg(null);
 
         const res = await fetch(`/api/s3/buckets/refetch`, {
-            method: "PUT",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },

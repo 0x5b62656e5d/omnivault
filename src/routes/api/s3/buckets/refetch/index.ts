@@ -10,7 +10,7 @@ import { createStandardResponse } from "@/lib/utils";
 export const Route = createFileRoute("/api/s3/buckets/refetch/")({
     server: {
         handlers: {
-            PUT: async () => {
+            POST: async () => {
                 const session = await getSession();
 
                 if (!session) {
