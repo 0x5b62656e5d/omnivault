@@ -23,6 +23,7 @@ function RouteComponent() {
         string | null
     >(null);
     const [errorMsg, setErrormsg] = useState<string | null>(null);
+    const [isRefetching, setIsRefetching] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -82,6 +83,7 @@ function RouteComponent() {
 
     const handleRefetchBuckets = async () => {
         setErrormsg(null);
+        setIsRefetching(true);
 
         const res = await fetch(`/api/s3/buckets/refetch`, {
             method: "POST",
@@ -89,6 +91,8 @@ function RouteComponent() {
                 "Content-Type": "application/json",
             },
         });
+
+        setIsRefetching(false);
 
         if (!res.ok) {
             setErrormsg("Failed to refetch S3 buckets - Err 105");
@@ -172,8 +176,12 @@ function RouteComponent() {
                 )}
                 <Button onClick={handleAddAccount}>Add S3 Account</Button>
                 {data && (
-                    <Button onClick={handleRefetchBuckets}>
-                        Refetch S3 buckets
+                    <Button
+                        onClick={handleRefetchBuckets}
+                        disabled={isRefetching}
+                        className={`${isRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                    >
+                        {isRefetching ? "Refetching..." : "Refetch S3 buckets"}
                     </Button>
                 )}
 
