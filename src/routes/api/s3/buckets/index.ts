@@ -1,7 +1,10 @@
 import {
+    BucketAlreadyExists,
+    BucketAlreadyOwnedByYou,
     CreateBucketCommand,
     DeleteBucketCommand,
     ListObjectsV2Command,
+    S3ServiceException,
 } from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
@@ -144,28 +147,92 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     region: row.region,
                 });
 
-                await client.send(
-                    new CreateBucketCommand({
-                        Bucket: bucketName,
-                    }),
-                );
+                try {
+                    await client.send(
+                        new CreateBucketCommand({
+                            Bucket: bucketName,
+                        }),
+                    );
 
-                await loadBucketRegions(
-                    session.user.id,
-                    {
-                        accessKeyId: decrypt(row.accessKeyId),
-                        secretAccessKey: decrypt(row.secretAccessKey),
-                        region: row.region,
-                    },
-                    bucketName,
-                );
+                    await loadBucketRegions(
+                        session.user.id,
+                        {
+                            accessKeyId: decrypt(row.accessKeyId),
+                            secretAccessKey: decrypt(row.secretAccessKey),
+                            region: row.region,
+                        },
+                        bucketName,
+                    );
 
-                return new Response(null, {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    status: 204,
-                });
+                    return new Response(null, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        status: 204,
+                    });
+                } catch (error) {
+                    const awsError = error as
+                        | BucketAlreadyExists
+                        | BucketAlreadyOwnedByYou
+                        | S3ServiceException;
+
+                    if (
+                        awsError.name === "BucketAlreadyExists" ||
+                        awsError.name === "BucketAlreadyOwnedByYou"
+                    ) {
+                        return new Response(
+                            JSON.stringify(
+                                createStandardResponse(
+                                    false,
+                                    null,
+                                    "Bucket already exists",
+                                    null,
+                                ),
+                            ),
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                status: 409,
+                            },
+                        );
+                    } else if (awsError.name === "InvalidBucketName") {
+                        return new Response(
+                            JSON.stringify(
+                                createStandardResponse(
+                                    false,
+                                    null,
+                                    "Invalid bucket name",
+                                    null,
+                                ),
+                            ),
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                status: 400,
+                            },
+                        );
+                    }
+
+                    console.error("Error creating bucket:", error);
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Error creating bucket",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 500,
+                        },
+                    );
+                }
             },
             DELETE: async ({ request }) => {
                 const session = await getSession();
