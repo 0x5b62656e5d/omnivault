@@ -430,6 +430,10 @@ function RouteComponent() {
                             type="button"
                             key={`${idx}-Download`}
                             onClick={() => getPresignedUrl(file.Key || "")}
+                            className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                            disabled={
+                                isDeletingFile || isLoading || isRefetching
+                            }
                         >
                             Download
                         </Button>
