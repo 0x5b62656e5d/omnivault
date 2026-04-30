@@ -408,9 +408,7 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col gap-4 w-[80%] mx-auto">
-            {(isLoading || isRefetching) && (
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-            )}
+            {(isLoading || isRefetching) && <Loader />}
             {data?.map((file, idx) => (
                 <div
                     key={idx}
@@ -599,9 +597,7 @@ function RouteComponent() {
                                     )}
                                 </form.Field>
 
-                                {isUploading && (
-                                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-                                )}
+                                {isUploading && <Loader />}
 
                                 {isLargeFile && (
                                     <p>

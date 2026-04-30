@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
+import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import type { s3credentials } from "@/db/schema";
 import { AWS_REGION_LIST } from "@/lib/s3/client";
@@ -153,9 +154,7 @@ function RouteComponent() {
                 Manage S3 accounts
             </h1>
             <div className="flex flex-col justify-center items-center gap-2">
-                {(isLoading || isRefetching) && (
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-                )}
+                {(isLoading || isRefetching) && <Loader />}
                 {data?.map(account => (
                     <div
                         key={account.id}

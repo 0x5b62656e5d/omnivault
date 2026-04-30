@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
 import { DeleteButton } from "@/components/deleteButton";
+import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
@@ -115,7 +116,7 @@ function DashboardLayout() {
             </h1>
             <div className="m-4 flex flex-col justify-center items-center gap-4">
                 {isLoading ? (
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                    <Loader />
                 ) : (
                     <>
                         <Button

@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import type { InferSelectModel } from "drizzle-orm";
 import { useState } from "react";
+import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import type { s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
@@ -57,10 +58,19 @@ function Component() {
     return (
         <div className="flex w-screen min-h-full p-4">
             {!location.pathname.startsWith("/account") && (
-                <nav className="flex flex-col justify-start items-center gap-2 max-w-40 m-4">
-                    {(isLoading || isRefetching) && (
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                <nav className="flex flex-col justify-start items-center gap-2 max-w-40 m-4 pr-4 border-r-2">
+                    <p className="text-xl font-medium mb-4">Providers</p>
+                    {data?.length === 0 && (
+                        <>
+                            <p className="text-center mb-2">
+                                No S3 accounts added yet.
+                            </p>
+                            <Link to="/account/manage-s3">
+                                <Button type="button">Add S3 account</Button>
+                            </Link>
+                        </>
                     )}
+                    {(isLoading || isRefetching) && <Loader />}
                     {data?.map(account => (
                         <Link
                             to="/$providerId"
@@ -80,7 +90,6 @@ function Component() {
                             </Button>
                         </Link>
                     ))}
-                    {data?.length === 0 && <p>No S3 accounts added yet.</p>}
                     {errorMsg && (
                         <p className="text-destructive">
                             {errorMsg || "Error fetching S3 accounts"}
