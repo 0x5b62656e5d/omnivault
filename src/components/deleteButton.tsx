@@ -5,10 +5,12 @@ export const DeleteButton = ({
     onClick,
     deleteConfirmationId,
     idMatcher,
+    btnContent = "Delete",
 }: {
     onClick: () => void;
     deleteConfirmationId: string | null;
     idMatcher: string;
+    btnContent?: string;
 }) => {
     return (
         <Button
@@ -31,7 +33,7 @@ export const DeleteButton = ({
                 >
                     {deleteConfirmationId === idMatcher
                         ? "Click again to confirm"
-                        : "Delete"}
+                        : btnContent}
                 </motion.span>
             </AnimatePresence>
         </Button>
