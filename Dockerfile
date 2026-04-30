@@ -43,26 +43,26 @@ COPY . .
 
 RUN pnpm run build
 
-FROM node:24-alpine AS migrator
+# FROM node:24-alpine AS migrator
 
-WORKDIR /app
+# WORKDIR /app
 
-RUN npm install -g pnpm
+# RUN npm install -g pnpm
 
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-COPY --from=builder /app/src/db ./src/db
+# COPY --from=builder /app/package.json ./package.json
+# COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+# COPY --from=builder /app/src/db ./src/db
 
-CMD ["pnpm", "db:migrate"]
+# CMD ["pnpm", "db:migrate"]
 
-FROM alpine:3.20 AS runner
+# FROM alpine:3.20 AS runner
 
-WORKDIR /app
+# WORKDIR /app
 
-RUN apk add --no-cache nodejs
+# RUN apk add --no-cache nodejs
 
-COPY --from=builder /app/.output ./.output
+# COPY --from=builder /app/.output ./.output
 
 CMD ["node", ".output/server/index.mjs"]
