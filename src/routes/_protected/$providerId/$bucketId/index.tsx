@@ -8,6 +8,7 @@ import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
+import { FiArrowUpRight } from "react-icons/fi";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,
@@ -379,15 +380,49 @@ function RouteComponent() {
         form.reset();
     };
 
+    const handleGetFilePreview = async (fileKey: string) => {
+        setErrormsg(null);
+        if (!fileKey) {
+            setErrormsg("Invalid file key");
+            return;
+        }
+
+        const res = await fetch(
+            `/api/s3/files/preview?providerId=${providerId}&bucketId=${bucketId}&fileIdentifier=${fileKey}`,
+        );
+
+        if (!res.ok) {
+            setErrormsg("S3 file mgmt error 202");
+            return;
+        }
+
+        const json = await res.json();
+
+        if (!json.success) {
+            setErrormsg("S3 file mgmt error 203");
+            return;
+        }
+
+        window.open(json.data, "_blank", "noopener,noreferrer");
+    };
+
     return (
         <div className="flex flex-col gap-4 w-[80%] mx-auto">
             {(isLoading || isRefetching) && (
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
             )}
             {data?.map((file, idx) => (
-                <div key={idx} className="flex justify-between items-center border-2 p-4">
+                <div
+                    key={idx}
+                    className="flex justify-between items-center border-2 p-4"
+                >
                     <div className="flex p-4 gap-2">
-                        <p>{file.Key}</p>
+                        <p
+                            className="inline-flex hover:cursor-pointer justify-center items-center"
+                            onClick={() => handleGetFilePreview(file.Key || "")}
+                        >
+                            <u>{file.Key}</u> <FiArrowUpRight />
+                        </p>
                         <p>{getFileSizeUnits(file.Size || 0)}</p>
                     </div>
                     <div className="flex flex-col gap-2">
