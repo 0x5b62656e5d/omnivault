@@ -119,87 +119,93 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <head>
                 <HeadContent />
             </head>
-            <body>
-                <header className="flex justify-between items-center p-4">
-                    <div className="flex gap-1">
-                        <nav className="flex gap-4 items-center">
-                            <p
-                                onClick={() =>
-                                    navigate({
-                                        to: "/",
-                                    })
-                                }
-                                className="hover:cursor-pointer"
-                            >
-                                Dashboard
-                            </p>
-                            <p
-                                onClick={() =>
-                                    navigate({
-                                        to: "/about",
-                                    })
-                                }
-                                className="hover:cursor-pointer"
-                            >
-                                About
-                            </p>
-                        </nav>
-                    </div>
-                    <nav className="flex gap-1">
-                        {user ? (
-                            <div ref={menuRef} className="relative">
-                                <div
-                                    onClick={toggleAccountMenu}
-                                    className="hover:cursor-pointer flex flex-col justify-start items-center"
+            <body className="min-h-screen w-full">
+                <div className="flex min-h-screen flex-col">
+                    <header className="flex justify-between items-center p-4">
+                        <div className="flex gap-1">
+                            <nav className="flex gap-4 items-center">
+                                <p
+                                    onClick={() =>
+                                        navigate({
+                                            to: "/",
+                                        })
+                                    }
+                                    className="hover:cursor-pointer"
                                 >
-                                    <p className="text-sm">Logged in as</p>
-                                    <div className="flex gap-1 items-center">
-                                        <img
-                                            src={user.image || ""}
-                                            alt={user.name}
-                                            className="rounded-full size-12"
-                                        />
-                                        <p className="text-lg">{user.name}</p>
+                                    Dashboard
+                                </p>
+                                <p
+                                    onClick={() =>
+                                        navigate({
+                                            to: "/about",
+                                        })
+                                    }
+                                    className="hover:cursor-pointer"
+                                >
+                                    About
+                                </p>
+                            </nav>
+                        </div>
+                        <nav className="flex gap-1">
+                            {user ? (
+                                <div ref={menuRef} className="relative">
+                                    <div
+                                        onClick={toggleAccountMenu}
+                                        className="hover:cursor-pointer flex flex-col justify-start items-center gap-1"
+                                    >
+                                        <p className="text-sm">Logged in as</p>
+                                        <div className="flex gap-1 items-center">
+                                            <img
+                                                src={user.image || ""}
+                                                alt={user.name}
+                                                className="rounded-full size-10"
+                                            />
+                                            <p className="text-xl">
+                                                {user.name}
+                                            </p>
+                                        </div>
                                     </div>
+                                    <AnimatePresence>
+                                        {!showAccountMenu && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -8 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -8 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute flex flex-col gap-1 right-0 top-full mt-2"
+                                            >
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowAccountMenu(
+                                                            true,
+                                                        );
+                                                        navigate({
+                                                            to: "/account",
+                                                        });
+                                                    }}
+                                                >
+                                                    Manage account
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleSignout}
+                                                >
+                                                    Sign out
+                                                </Button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
-                                <AnimatePresence>
-                                    {!showAccountMenu && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -8 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -8 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="absolute flex flex-col gap-1 right-0 top-full mt-2"
-                                        >
-                                            <Button
-                                                type="button"
-                                                onClick={() => {
-                                                    setShowAccountMenu(true);
-                                                    navigate({
-                                                        to: "/account",
-                                                    });
-                                                }}
-                                            >
-                                                Manage account
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                onClick={handleSignout}
-                                            >
-                                                Sign out
-                                            </Button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ) : (
-                            <Button type="button" onClick={handleSignin}>
-                                Sign in
-                            </Button>
-                        )}
-                    </nav>
-                </header>
-                {children}
+                            ) : (
+                                <Button type="button" onClick={handleSignin}>
+                                    Sign in
+                                </Button>
+                            )}
+                        </nav>
+                    </header>
+                    <main className="flex flex-1 min-h-0">{children}</main>
+                </div>
                 <TanStackDevtools
                     config={{
                         position: "bottom-right",

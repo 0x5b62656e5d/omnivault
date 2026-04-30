@@ -9,8 +9,9 @@ function RouteComponent() {
     const navigate = useNavigate();
 
     return (
-        <>
-            <nav className="flex flex-col justify-center items-center gap-2 max-w-40 m-4">
+        <div className="flex w-screen min-h-full p-4">
+            <nav className="flex flex-col justify-start items-center gap-2 max-w-40 m-4">
+                <p className="text-xl font-medium mb-4">Menu</p>
                 <Button
                     className="w-full"
                     onClick={() => navigate({ to: "/account" })}
@@ -24,7 +25,9 @@ function RouteComponent() {
                     Manage S3 accounts
                 </Button>
             </nav>
-            <Outlet />
-        </>
+            <div className="w-full">
+                <Outlet />
+            </div>
+        </div>
     );
 }

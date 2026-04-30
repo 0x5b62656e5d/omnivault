@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import type { s3buckets } from "@/db/schema";
+import { FiArrowUpRight } from "react-icons/fi";
 import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
@@ -47,8 +48,12 @@ function RouteComponent() {
             form.reset();
 
             if (!res.ok) {
-                console.error("S3 bucket mgmt error 101");
-                setErrormsg("Failed to add S3 bucket - Err 101");
+                const json = await res.json();
+
+                console.error(json.message || "S3 bucket mgmt error 101");
+                setErrormsg(
+                    json.message || "Failed to add S3 bucket - Err 101",
+                );
                 return;
             }
 
@@ -174,15 +179,40 @@ function RouteComponent() {
     };
 
     return (
-        <div>
-            {(isLoading || isRefetching || isManualRefetching) && (
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-            )}
-            {data?.map(bucket => (
-                <Link
-                    to="/$providerId/$bucketId"
-                    params={{ providerId: providerId, bucketId: bucket.id }}
-                    key={bucket.id}
+        <div className="flex flex-col">
+            <div className="flex flex-col w-xl self-center gap-4">
+                <div className="flex flex-col w-full gap-2">
+                    {(isLoading || isRefetching || isManualRefetching) && (
+                        <div className="self-center h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                    )}
+                    {data?.map(bucket => (
+                        <div
+                            key={bucket.id}
+                            className="flex justify-between items-center border p-4 rounded"
+                        >
+                            <Link
+                                to="/$providerId/$bucketId"
+                                params={{
+                                    providerId: providerId,
+                                    bucketId: bucket.id,
+                                }}
+                                key={bucket.id}
+                            >
+                                <button
+                                    type="button"
+                                    key={bucket.id}
+                                    disabled={
+                                        isLoading ||
+                                        isRefetching ||
+                                        isManualRefetching
+                                    }
+                                    className={`hover:cursor-pointer  ${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                >
+                                    <p className="inline-flex justify-center items-center gap-2 transition-transform duration-250 ease-in-out hover:scale-[1.025]">
+                                        <u>{bucket.name}</u> <FiArrowUpRight />
+                                    </p>
+                                </button>
+                            </Link>
                             <DeleteButton
                                 onClick={() => handleDeleteBucket(bucket.id)}
                                 deleteConfirmationId={deleteConfirmationId}
@@ -194,39 +224,32 @@ function RouteComponent() {
                                     isDeleting
                                 }
                             />
+                        </div>
+                    ))}
+                    {data?.length === 0 && <p>No S3 buckets added yet.</p>}
+                    {errorMsg && (
+                        <p className="text-destructive">
+                            {errorMsg || "Error fetching S3 buckets"}
+                        </p>
+                    )}
+                </div>
+                <Button
+                    onClick={handleCreateBucket}
+                    disabled={isLoading || isRefetching || isManualRefetching}
+                    className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                 >
-                    <Button
-                        type="button"
-                        key={bucket.id}
-                        disabled={
-                            isLoading || isRefetching || isManualRefetching
-                        }
-                        className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                    >
-                        <h3>{bucket.name}</h3>
-                    </Button>
-                </Link>
-            ))}
-            {data?.length === 0 && <p>No S3 buckets added yet.</p>}
-            {errorMsg && (
-                <p className="text-destructive">
-                    {errorMsg || "Error fetching S3 accounts"}
-                </p>
-            )}
-            <Button
-                onClick={handleCreateBucket}
-                disabled={isLoading || isRefetching || isManualRefetching}
-                className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-            >
-                Create bucket
-            </Button>
-            <Button
-                onClick={handleRefetchBuckets}
-                disabled={isLoading || isRefetching || isManualRefetching}
-                className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-            >
-                {isManualRefetching ? "Refetching..." : "Refetch S3 buckets"}
-            </Button>
+                    Create bucket
+                </Button>
+                <Button
+                    onClick={handleRefetchBuckets}
+                    disabled={isLoading || isRefetching || isManualRefetching}
+                    className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                >
+                    {isManualRefetching
+                        ? "Refetching..."
+                        : "Refetch S3 buckets"}
+                </Button>
+            </div>
             <AnimatePresence>
                 {showAddBucketForm && (
                     <motion.div

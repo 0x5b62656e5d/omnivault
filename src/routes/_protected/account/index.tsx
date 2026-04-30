@@ -1,10 +1,11 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { set } from "zod";
 
 export const Route = createFileRoute("/_protected/account/")({
     component: DashboardLayout,
@@ -15,6 +16,7 @@ function DashboardLayout() {
     const [isLoading, setIsLoading] = useState(true);
     const [deleteConfirmation, setDeleteConfirmation] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [linkingOperation, setLinkingOperation] = useState(false);
 
     const loadProviders = useCallback(async () => {
         setIsLoading(true);
@@ -33,6 +35,8 @@ function DashboardLayout() {
     }, [loadProviders]);
 
     const linkGithub = async (link: boolean) => {
+        setLinkingOperation(true);
+
         if (link) {
             await authClient.linkSocial({
                 provider: "github",
@@ -45,9 +49,13 @@ function DashboardLayout() {
         }
 
         await loadProviders();
+
+        setLinkingOperation(false);
     };
 
     const linkDiscord = async (link: boolean) => {
+        setLinkingOperation(true);
+
         if (link) {
             await authClient.linkSocial({
                 provider: "discord",
@@ -60,9 +68,12 @@ function DashboardLayout() {
         }
 
         await loadProviders();
+        setLinkingOperation(false);
     };
 
     const linkRailway = async (link: boolean) => {
+        setLinkingOperation(true);
+
         if (link) {
             await authClient.linkSocial({
                 provider: "railway",
@@ -75,11 +86,17 @@ function DashboardLayout() {
         }
 
         await loadProviders();
+        setLinkingOperation(false);
     };
 
     const deleteAccount = async () => {
         if (!deleteConfirmation) {
             setDeleteConfirmation(true);
+
+            setTimeout(() => {
+                setDeleteConfirmation(false);
+            }, 3000);
+
             return;
         }
 
@@ -93,8 +110,10 @@ function DashboardLayout() {
     };
 
     return (
-        <>
-            <Outlet />
+        <div className="flex flex-col gap-6">
+            <h1 className="text-2xl font-medium self-center">
+                Manage linked accounts
+            </h1>
             <div className="m-4 flex flex-col justify-center items-center gap-4">
                 {isLoading ? (
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
@@ -105,6 +124,12 @@ function DashboardLayout() {
                                 linkGithub(!providerList.includes("github"))
                             }
                             type="button"
+                            disabled={linkingOperation}
+                            className={
+                                linkingOperation
+                                    ? "cursor-not-allowed opacity-70 pointer-events-none"
+                                    : ""
+                            }
                         >
                             <FaGithub />{" "}
                             {providerList.includes("github")
@@ -117,6 +142,12 @@ function DashboardLayout() {
                                 linkDiscord(!providerList.includes("discord"))
                             }
                             type="button"
+                            disabled={linkingOperation}
+                            className={
+                                linkingOperation
+                                    ? "cursor-not-allowed opacity-70 pointer-events-none"
+                                    : ""
+                            }
                         >
                             <FaDiscord />{" "}
                             {providerList.includes("discord")
@@ -129,6 +160,12 @@ function DashboardLayout() {
                                 linkRailway(!providerList.includes("railway"))
                             }
                             type="button"
+                            disabled={linkingOperation}
+                            className={
+                                linkingOperation
+                                    ? "cursor-not-allowed opacity-70 pointer-events-none"
+                                    : ""
+                            }
                         >
                             <SiRailway />{" "}
                             {providerList.includes("railway")
@@ -147,6 +184,6 @@ function DashboardLayout() {
                     </>
                 )}
             </div>
-        </>
+        </div>
     );
 }

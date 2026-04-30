@@ -105,6 +105,11 @@ function RouteComponent() {
     const handleDeleteAccount = async (accountId: string) => {
         if (deleteConfirmationId !== accountId) {
             setDeleteConfirmationId(accountId);
+
+            setTimeout(() => {
+                setDeleteConfirmationId(null);
+            }, 3000);
+
             return;
         }
 
@@ -143,8 +148,10 @@ function RouteComponent() {
     };
 
     return (
-        <main>
-            <h1>Manage S3 accounts</h1>
+        <div className="flex flex-col gap-6">
+            <h1 className="text-2xl font-medium self-center">
+                Manage S3 accounts
+            </h1>
             <div className="flex flex-col justify-center items-center gap-2">
                 {(isLoading || isRefetching) && (
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
@@ -152,19 +159,21 @@ function RouteComponent() {
                 {data?.map(account => (
                     <div
                         key={account.id}
-                        className="border p-4 rounded w-full max-w-md"
+                        className="flex justify-between items-center border p-4 rounded w-full max-w-md"
                     >
-                        <p>
-                            <strong>Name:</strong> {account.name}
-                        </p>
-                        <p>
-                            <strong>Date created:</strong>{" "}
-                            {account.createdAt
-                                ? new Date(
-                                      account.createdAt,
-                                  ).toLocaleDateString()
-                                : "Unknown"}
-                        </p>
+                        <div>
+                            <p>
+                                <strong>Name:</strong> {account.name}
+                            </p>
+                            <p>
+                                <strong>Date created:</strong>{" "}
+                                {account.createdAt
+                                    ? new Date(
+                                          account.createdAt,
+                                      ).toLocaleDateString()
+                                    : "Unknown"}
+                            </p>
+                        </div>
                         <DeleteButton
                             onClick={() => handleDeleteAccount(account.id)}
                             deleteConfirmationId={deleteConfirmationId}
@@ -509,6 +518,6 @@ function RouteComponent() {
                     )}
                 </AnimatePresence>
             </div>
-        </main>
+        </div>
     );
 }

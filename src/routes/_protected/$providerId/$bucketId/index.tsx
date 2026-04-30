@@ -298,6 +298,11 @@ function RouteComponent() {
     const deleteFile = async (fileKey: string) => {
         if (deleteConfirmationId !== fileKey) {
             setDeleteConfirmationId(fileKey);
+
+            setTimeout(() => {
+                setDeleteConfirmationId(null);
+            }, 3000);
+
             return;
         }
 
@@ -375,29 +380,33 @@ function RouteComponent() {
     };
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-[80%] mx-auto">
             {(isLoading || isRefetching) && (
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
             )}
             {data?.map((file, idx) => (
-                <div key={idx} className="flex border-2 p-4">
-                    <div className="flex p-4 border-2 gap-2">
+                <div key={idx} className="flex justify-between items-center border-2 p-4">
+                    <div className="flex p-4 gap-2">
                         <p>{file.Key}</p>
                         <p>{getFileSizeUnits(file.Size || 0)}</p>
                     </div>
-                    <Button
-                        type="button"
-                        key={`${idx}-Download`}
-                        onClick={() => getPresignedUrl(file.Key || "")}
-                    >
-                        Download
-                    </Button>
-                    <DeleteButton
-                        onClick={() => deleteFile(file.Key || "")}
-                        deleteConfirmationId={deleteConfirmationId}
-                        idMatcher={file.Key || ""}
-                        disabled={isDeletingFile || isLoading || isRefetching}
-                    />
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            type="button"
+                            key={`${idx}-Download`}
+                            onClick={() => getPresignedUrl(file.Key || "")}
+                        >
+                            Download
+                        </Button>
+                        <DeleteButton
+                            onClick={() => deleteFile(file.Key || "")}
+                            deleteConfirmationId={deleteConfirmationId}
+                            idMatcher={file.Key || ""}
+                            disabled={
+                                isDeletingFile || isLoading || isRefetching
+                            }
+                        />
+                    </div>
                 </div>
             ))}
             {data?.length === 0 && <p>No files found in this bucket.</p>}
