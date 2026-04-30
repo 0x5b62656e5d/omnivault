@@ -48,7 +48,7 @@ function RouteComponent() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center m-4 p-4 gap-4">
+        <div className="w-full flex flex-col justify-center items-center m-4 p-4 gap-4">
             <p>You must sign in.</p>
             <Button onClick={signinWithGithub} type="button">
                 <FaGithub /> Sign in with Github
