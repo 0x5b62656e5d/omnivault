@@ -14,6 +14,7 @@ function DashboardLayout() {
     const [providerList, setProviderList] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const loadProviders = useCallback(async () => {
         setIsLoading(true);
@@ -82,9 +83,13 @@ function DashboardLayout() {
             return;
         }
 
+        setIsDeleting(true);
+
         await authClient.deleteUser({
             callbackURL: "/signin",
         });
+
+        setIsDeleting(false);
     };
 
     return (
@@ -137,6 +142,7 @@ function DashboardLayout() {
                                 deleteConfirmation ? "account" : null
                             }
                             idMatcher={"account"}
+                            disabled={isDeleting}
                         />
                     </>
                 )}

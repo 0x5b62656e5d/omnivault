@@ -24,6 +24,7 @@ function RouteComponent() {
     >(null);
     const [errorMsg, setErrormsg] = useState<string | null>(null);
     const [isManualRefetching, setIsManualRefetching] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -107,6 +108,8 @@ function RouteComponent() {
             return;
         }
 
+        setIsDeleting(true);
+
         setDeleteConfirmationId(null);
 
         const res = await fetch(`/api/s3/accounts`, {
@@ -116,6 +119,8 @@ function RouteComponent() {
                 "Content-Type": "application/json",
             },
         });
+
+        setIsDeleting(false);
 
         if (!res.ok) {
             setErrormsg("Failed to delete S3 account - Err 104");
@@ -164,6 +169,7 @@ function RouteComponent() {
                             onClick={() => handleDeleteAccount(account.id)}
                             deleteConfirmationId={deleteConfirmationId}
                             idMatcher={account.id}
+                            disabled={isDeleting}
                         />
                     </div>
                 ))}

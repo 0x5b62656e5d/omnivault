@@ -31,6 +31,7 @@ function RouteComponent() {
         uploadId: string;
         fileName: string;
     } | null>(null);
+    const [isDeletingFile, setIsDeletingFile] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -300,6 +301,8 @@ function RouteComponent() {
             return;
         }
 
+        setIsDeletingFile(true);
+
         setDeleteConfirmationId(null);
 
         setErrormsg(null);
@@ -314,6 +317,8 @@ function RouteComponent() {
                 method: "DELETE",
             },
         );
+
+        setIsDeletingFile(false);
 
         if (!res.ok) {
             setErrormsg("S3 file mgmt error 302");
@@ -334,6 +339,8 @@ function RouteComponent() {
             setCancelMultipart(true);
             return;
         } else if (isUploading && isLargeFile && cancelMultipart) {
+            setIsDeletingFile(true);
+
             uploadAbortControllerRef.current?.abort();
 
             const multipartUpload = multipartUploadRef.current;
@@ -363,6 +370,7 @@ function RouteComponent() {
         }
 
         setShowUploadFileForm(false);
+        setIsDeletingFile(false);
         form.reset();
     };
 
@@ -388,6 +396,7 @@ function RouteComponent() {
                         onClick={() => deleteFile(file.Key || "")}
                         deleteConfirmationId={deleteConfirmationId}
                         idMatcher={file.Key || ""}
+                        disabled={isDeletingFile || isLoading || isRefetching}
                     />
                 </div>
             ))}
@@ -566,6 +575,7 @@ function RouteComponent() {
                                             }
                                             idMatcher={"cancel"}
                                             btnContent="Cancel upload"
+                                            disabled={isDeletingFile}
                                         />
                                     ) : (
                                         <Button

@@ -23,6 +23,7 @@ function RouteComponent() {
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<
         string | null
     >(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -147,6 +148,8 @@ function RouteComponent() {
             return;
         }
 
+        setIsDeleting(true);
+
         setDeleteConfirmationId(null);
 
         const res = await fetch(`/api/s3/buckets`, {
@@ -156,6 +159,8 @@ function RouteComponent() {
                 "Content-Type": "application/json",
             },
         });
+
+        setIsDeleting(false);
 
         if (!res.ok) {
             setErrormsg("Failed to delete S3 bucket - Err 104");
@@ -182,6 +187,12 @@ function RouteComponent() {
                                 onClick={() => handleDeleteBucket(bucket.id)}
                                 deleteConfirmationId={deleteConfirmationId}
                                 idMatcher={bucket.id}
+                                disabled={
+                                    isLoading ||
+                                    isRefetching ||
+                                    isManualRefetching ||
+                                    isDeleting
+                                }
                             />
                 >
                     <Button

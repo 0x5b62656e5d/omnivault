@@ -5,18 +5,21 @@ export const DeleteButton = ({
     onClick,
     deleteConfirmationId,
     idMatcher,
+    disabled,
     btnContent = "Delete",
 }: {
     onClick: () => void;
     deleteConfirmationId: string | null;
     idMatcher: string;
+    disabled: boolean;
     btnContent?: string;
 }) => {
     return (
         <Button
             variant="destructive"
             onClick={onClick}
-            className="min-w-48 overflow-hidden"
+            className={`min-w-48 overflow-hidden ${disabled ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+            disabled={disabled}
         >
             <AnimatePresence mode="wait" initial={false}>
                 <motion.span
