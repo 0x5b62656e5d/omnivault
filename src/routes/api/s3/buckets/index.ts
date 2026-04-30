@@ -375,6 +375,10 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                         }),
                     );
 
+                    await db
+                        .delete(s3buckets)
+                        .where(eq(s3buckets.id, bucketId));
+
                     return new Response(null, {
                         headers: {
                             "Content-Type": "application/json",
