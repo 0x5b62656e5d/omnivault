@@ -26,6 +26,8 @@ import { Route as ProtectedAccountManageS3IndexRouteImport } from './routes/_pro
 import { Route as ProtectedProviderIdBucketIdIndexRouteImport } from './routes/_protected/$providerId/$bucketId/index'
 import { Route as ApiS3FilesDownloadIndexRouteImport } from './routes/api/s3/files/download/index'
 import { Route as ApiS3BucketsRefetchIndexRouteImport } from './routes/api/s3/buckets/refetch/index'
+import { Route as ApiS3FilesMultipartCompleteIndexRouteImport } from './routes/api/s3/files/multipart/complete/index'
+import { Route as ApiS3FilesMultipartAbortIndexRouteImport } from './routes/api/s3/files/multipart/abort/index'
 import { Route as ApiS3BucketsRefetchProviderIdIndexRouteImport } from './routes/api/s3/buckets/refetch/$providerId/index'
 
 const ProtectedRoute = ProtectedRouteImport.update({
@@ -116,6 +118,18 @@ const ApiS3BucketsRefetchIndexRoute =
     path: '/api/s3/buckets/refetch/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiS3FilesMultipartCompleteIndexRoute =
+  ApiS3FilesMultipartCompleteIndexRouteImport.update({
+    id: '/api/s3/files/multipart/complete/',
+    path: '/api/s3/files/multipart/complete/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiS3FilesMultipartAbortIndexRoute =
+  ApiS3FilesMultipartAbortIndexRouteImport.update({
+    id: '/api/s3/files/multipart/abort/',
+    path: '/api/s3/files/multipart/abort/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiS3BucketsRefetchProviderIdIndexRoute =
   ApiS3BucketsRefetchProviderIdIndexRouteImport.update({
     id: '/api/s3/buckets/refetch/$providerId/',
@@ -141,6 +155,8 @@ export interface FileRoutesByFullPath {
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
+  '/api/s3/files/multipart/abort/': typeof ApiS3FilesMultipartAbortIndexRoute
+  '/api/s3/files/multipart/complete/': typeof ApiS3FilesMultipartCompleteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof ProtectedIndexRoute
@@ -159,6 +175,8 @@ export interface FileRoutesByTo {
   '/api/s3/buckets/refetch': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/buckets/refetch/$providerId': typeof ApiS3BucketsRefetchProviderIdIndexRoute
+  '/api/s3/files/multipart/abort': typeof ApiS3FilesMultipartAbortIndexRoute
+  '/api/s3/files/multipart/complete': typeof ApiS3FilesMultipartCompleteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -180,6 +198,8 @@ export interface FileRoutesById {
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
+  '/api/s3/files/multipart/abort/': typeof ApiS3FilesMultipartAbortIndexRoute
+  '/api/s3/files/multipart/complete/': typeof ApiS3FilesMultipartCompleteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +221,8 @@ export interface FileRouteTypes {
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
     | '/api/s3/buckets/refetch/$providerId/'
+    | '/api/s3/files/multipart/abort/'
+    | '/api/s3/files/multipart/complete/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -219,6 +241,8 @@ export interface FileRouteTypes {
     | '/api/s3/buckets/refetch'
     | '/api/s3/files/download'
     | '/api/s3/buckets/refetch/$providerId'
+    | '/api/s3/files/multipart/abort'
+    | '/api/s3/files/multipart/complete'
   id:
     | '__root__'
     | '/_protected'
@@ -239,6 +263,8 @@ export interface FileRouteTypes {
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
     | '/api/s3/buckets/refetch/$providerId/'
+    | '/api/s3/files/multipart/abort/'
+    | '/api/s3/files/multipart/complete/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -254,6 +280,8 @@ export interface RootRouteChildren {
   ApiS3BucketsRefetchIndexRoute: typeof ApiS3BucketsRefetchIndexRoute
   ApiS3FilesDownloadIndexRoute: typeof ApiS3FilesDownloadIndexRoute
   ApiS3BucketsRefetchProviderIdIndexRoute: typeof ApiS3BucketsRefetchProviderIdIndexRoute
+  ApiS3FilesMultipartAbortIndexRoute: typeof ApiS3FilesMultipartAbortIndexRoute
+  ApiS3FilesMultipartCompleteIndexRoute: typeof ApiS3FilesMultipartCompleteIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -377,6 +405,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiS3BucketsRefetchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/s3/files/multipart/complete/': {
+      id: '/api/s3/files/multipart/complete/'
+      path: '/api/s3/files/multipart/complete'
+      fullPath: '/api/s3/files/multipart/complete/'
+      preLoaderRoute: typeof ApiS3FilesMultipartCompleteIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/s3/files/multipart/abort/': {
+      id: '/api/s3/files/multipart/abort/'
+      path: '/api/s3/files/multipart/abort'
+      fullPath: '/api/s3/files/multipart/abort/'
+      preLoaderRoute: typeof ApiS3FilesMultipartAbortIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/s3/buckets/refetch/$providerId/': {
       id: '/api/s3/buckets/refetch/$providerId/'
       path: '/api/s3/buckets/refetch/$providerId'
@@ -432,6 +474,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiS3FilesDownloadIndexRoute: ApiS3FilesDownloadIndexRoute,
   ApiS3BucketsRefetchProviderIdIndexRoute:
     ApiS3BucketsRefetchProviderIdIndexRoute,
+  ApiS3FilesMultipartAbortIndexRoute: ApiS3FilesMultipartAbortIndexRoute,
+  ApiS3FilesMultipartCompleteIndexRoute: ApiS3FilesMultipartCompleteIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

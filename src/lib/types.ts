@@ -11,3 +11,5 @@ export interface S3Credential {
     endpointUrl?: string;
     region: string;
 }
+
+export const PART_SIZE = 8 * 1024 * 1024; // 8 MB
