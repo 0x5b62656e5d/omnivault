@@ -1,8 +1,11 @@
 import {
+    GetBucketCorsCommand,
     HeadBucketCommand,
     ListBucketsCommand,
     type ListBucketsCommandOutput,
     NotFound,
+    PutBucketCorsCommand,
+    S3Client,
     S3ServiceException,
 } from "@aws-sdk/client-s3";
 import { eq } from "drizzle-orm";
@@ -11,6 +14,26 @@ import { s3buckets, s3credentials } from "@/db/schema";
 import type { S3Credential } from "@/lib/types";
 import { hmacHash } from "../encryption";
 import { createClient } from "./client";
+import { env } from "@/env/server";
+
+const omnivaultRule = {
+    ID: "omnivault-browser-access",
+    AllowedOrigins:
+        env.ENVIRONMENT === "production"
+            ? ["https://omnivault.benkou.dev"]
+            : ["http://localhost:3000", "https://omnivault.benkou.dev"],
+    AllowedMethods: ["GET", "PUT", "DELETE", "HEAD"],
+    ExposeHeaders: ["ETag"],
+    AllowedHeaders: [
+        "Content-Type",
+        "x-amz-content-sha256",
+        "x-amz-date",
+        "authorization",
+        "x-amz-checksum-crc32",
+        "x-amz-sdk-checksum-algorithm",
+    ],
+    MaxAgeSeconds: 3000,
+};
 
 export const loadBuckets = async (
     region: string,
@@ -63,6 +86,8 @@ export const loadBucketRegions = async (
                         region: res.BucketRegion || "auto",
                     },
                 });
+
+            await configureBucketCors(client, bucket);
         } catch (error) {
             if (error instanceof NotFound) {
                 console.warn(
@@ -74,5 +99,37 @@ export const loadBucketRegions = async (
                 console.error(`Error checking bucket ${bucket} region:`, error);
             }
         }
+    }
+};
+
+export const configureBucketCors = async (client: S3Client, bucket: string) => {
+    try {
+        const existingCors = await client
+            .send(new GetBucketCorsCommand({ Bucket: bucket }))
+            .catch(error => {
+                if (error.name === "NoSuchCORSConfiguration") {
+                    return null;
+                }
+
+                throw error;
+            });
+
+        const existingRules = existingCors?.CORSRules ?? [];
+
+        const rulesWithoutOldOmnivaultRule = existingRules.filter(
+            rule => rule.ID !== "omnivault-browser-access",
+        );
+
+        await client.send(
+            new PutBucketCorsCommand({
+                Bucket: bucket,
+                CORSConfiguration: {
+                    CORSRules: [...rulesWithoutOldOmnivaultRule, omnivaultRule],
+                },
+            }),
+        );
+    } catch (error) {
+        console.error(`Error configuring CORS for bucket ${bucket}:`, error);
+        throw new Error(`Failed to configure CORS for bucket ${bucket}`);
     }
 };
