@@ -7,9 +7,10 @@ import { useRef, useState } from "react";
 import { FiArrowUpRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
-import { Button } from "@/components/ui/button";
-import { getFileSizeUnits } from "@/lib/filesizeUnits";
 import { Loader } from "@/components/loader";
+import { Button } from "@/components/ui/button";
+import { stripExtension } from "@/lib/fileExtension";
+import { getFileSizeUnits } from "@/lib/filesizeUnits";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,
@@ -34,6 +35,8 @@ function RouteComponent() {
         fileName: string;
     } | null>(null);
     const [isDeletingFile, setIsDeletingFile] = useState(false);
+    const [showRenameForm, setShowRenameForm] = useState(false);
+    const [oldFilename, setOldFilename] = useState<string>("");
 
     const form = useForm({
         defaultValues: {
@@ -236,6 +239,41 @@ function RouteComponent() {
         },
     });
 
+    const renameForm = useForm({
+        defaultValues: {
+            newFilename: "",
+        },
+        onSubmit: async ({ value }) => {
+            setShowRenameForm(false);
+            setErrormsg(null);
+
+            const res = await fetch("/api/s3/files", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    newFilename: value.newFilename,
+                    providerId,
+                    bucketId,
+                    oldFilename,
+                }),
+            });
+
+            form.reset();
+
+            if (!res.ok) {
+                console.error("S3 file mgmt error 101");
+                setErrormsg("Failed to rename S3 file - Err 101");
+                return;
+            }
+
+            queryClient.invalidateQueries({
+                queryKey: ["s3-files", providerId, bucketId],
+            });
+        },
+    });
+
     const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-files", providerId, bucketId],
         queryFn: async () => {
@@ -341,6 +379,17 @@ function RouteComponent() {
         setShowUploadFileForm(true);
     };
 
+    const handleRenameFile = (filename: string) => {
+        setOldFilename(filename);
+        renameForm.setFieldValue("newFilename", stripExtension(filename));
+        setShowRenameForm(true);
+    };
+
+    const handleCloseRenameForm = () => {
+        setShowRenameForm(false);
+        form.reset();
+    };
+
     const handleCloseUploadFileForm = async () => {
         if (isUploading && isLargeFile && !cancelMultipart) {
             setCancelMultipart(true);
@@ -424,26 +473,39 @@ function RouteComponent() {
                         </p>
                         <p>{getFileSizeUnits(file.Size || 0)}</p>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex gap-2 items-center">
                         <Button
                             type="button"
-                            key={`${idx}-Download`}
-                            onClick={() => getPresignedUrl(file.Key || "")}
+                            key={`${idx}-Rename`}
+                            onClick={() => handleRenameFile(file.Key || "")}
                             className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                             disabled={
                                 isDeletingFile || isLoading || isRefetching
                             }
                         >
-                            Download
+                            Rename
                         </Button>
-                        <DeleteButton
-                            onClick={() => deleteFile(file.Key || "")}
-                            deleteConfirmationId={deleteConfirmationId}
-                            idMatcher={file.Key || ""}
-                            disabled={
-                                isDeletingFile || isLoading || isRefetching
-                            }
-                        />
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                type="button"
+                                key={`${idx}-Download`}
+                                onClick={() => getPresignedUrl(file.Key || "")}
+                                className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                disabled={
+                                    isDeletingFile || isLoading || isRefetching
+                                }
+                            >
+                                Download
+                            </Button>
+                            <DeleteButton
+                                onClick={() => deleteFile(file.Key || "")}
+                                deleteConfirmationId={deleteConfirmationId}
+                                idMatcher={file.Key || ""}
+                                disabled={
+                                    isDeletingFile || isLoading || isRefetching
+                                }
+                            />
+                        </div>
                     </div>
                 </div>
             ))}
@@ -460,6 +522,124 @@ function RouteComponent() {
             >
                 Upload file
             </Button>
+            <AnimatePresence>
+                {showRenameForm && (
+                    <motion.div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <motion.div
+                            className="relative w-full max-w-lg rounded-xl border bg-background p-6 shadow-2xl"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <button
+                                type="button"
+                                onClick={handleCloseRenameForm}
+                                className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-muted"
+                                aria-label="Close rename file form"
+                            >
+                                <IoClose className="h-6 w-6" />
+                            </button>
+
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold">
+                                    Rename File
+                                </h2>
+                            </div>
+
+                            <form
+                                className="flex flex-col gap-4"
+                                onSubmit={event => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    void renameForm.handleSubmit();
+                                }}
+                            >
+                                <renameForm.Field
+                                    name="newFilename"
+                                    validators={{
+                                        onChange: ({ value }) => {
+                                            if (
+                                                value.trim() &&
+                                                (value.startsWith("/") ||
+                                                    value.endsWith("/"))
+                                            ) {
+                                                return "File name cannot start or end with a slash";
+                                            }
+
+                                            if (
+                                                value.trim() &&
+                                                !value.match(
+                                                    /^(?=.*[A-Za-z0-9])[A-Za-z0-9!\-_.*'()[\]/]+$/,
+                                                )
+                                            ) {
+                                                return "Invalid characters in file name";
+                                            }
+
+                                            if (value.trim() === oldFilename) {
+                                                return "New file name cannot be the same as the old file name";
+                                            }
+
+                                            return undefined;
+                                        },
+                                    }}
+                                >
+                                    {field => (
+                                        <label className="flex flex-col gap-1">
+                                            <span className="text-sm font-medium">
+                                                File name (without extension)
+                                            </span>
+                                            <input
+                                                value={field.state.value}
+                                                onBlur={field.handleBlur}
+                                                onChange={event => {
+                                                    field.handleChange(
+                                                        event.target.value,
+                                                    );
+                                                }}
+                                                placeholder="Filename"
+                                                className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                            />
+                                            {field.state.meta.errors.length >
+                                                0 && (
+                                                <span className="text-sm text-destructive">
+                                                    {field.state.meta.errors.join(
+                                                        ", ",
+                                                    )}
+                                                </span>
+                                            )}
+                                        </label>
+                                    )}
+                                </renameForm.Field>
+
+                                <div className="mt-2 flex justify-end gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={handleCloseRenameForm}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching ||
+                                            isUploading
+                                        }
+                                        className={`${isUploading ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">Rename file</Button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <AnimatePresence>
                 {showUploadFileForm && (
                     <motion.div

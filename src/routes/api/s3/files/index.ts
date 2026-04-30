@@ -1,4 +1,5 @@
 import {
+    CopyObjectCommand,
     CreateMultipartUploadCommand,
     DeleteObjectCommand,
     ListObjectsV2Command,
@@ -12,6 +13,7 @@ import { db } from "@/db";
 import { s3buckets, s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
 import { decrypt } from "@/lib/encryption";
+import { getExtension } from "@/lib/fileExtension";
 import { createClient } from "@/lib/s3/client";
 import { PART_SIZE } from "@/lib/types";
 import { createStandardResponse } from "@/lib/utils";
@@ -142,6 +144,141 @@ export const Route = createFileRoute("/api/s3/files/")({
                                 false,
                                 null,
                                 "Error generating signed URL",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 500,
+                        },
+                    );
+                }
+            },
+            PATCH: async ({ request }) => {
+                const session = await getSession();
+
+                if (!session) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Unauthorized",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 401,
+                        },
+                    );
+                }
+
+                const { newFilename, oldFilename, providerId, bucketId } =
+                    await request.json();
+
+                const [row] = await db
+                    .select({
+                        credential: s3credentials,
+                        bucket: s3buckets,
+                    })
+                    .from(s3buckets)
+                    .innerJoin(
+                        s3credentials,
+                        eq(s3buckets.parentCredential, s3credentials.id),
+                    )
+                    .where(
+                        and(
+                            eq(s3buckets.id, bucketId),
+                            eq(s3buckets.parentCredential, providerId),
+                            eq(s3credentials.ownedBy, session.user.id),
+                        ),
+                    )
+                    .limit(1);
+
+                if (!row) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Bucket not found",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 404,
+                        },
+                    );
+                }
+
+                const client = createClient(row.bucket.region, {
+                    accessKeyId: decrypt(row.credential.accessKeyId),
+                    secretAccessKey: decrypt(row.credential.secretAccessKey),
+                    endpointUrl: row.credential.endpointUrl || undefined,
+                    region: row.credential.region,
+                });
+
+                const newKey = `${newFilename.trim()}.${getExtension(oldFilename)}`;
+
+                if (!newFilename.trim() || newKey === oldFilename) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Invalid rename target",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 400,
+                        },
+                    );
+                }
+
+                try {
+                    await client.send(
+                        new CopyObjectCommand({
+                            Bucket: row.bucket.name,
+                            Key: newKey,
+                            CopySource: encodeURIComponent(
+                                `${row.bucket.name}/${oldFilename}`,
+                            ),
+                        }),
+                    );
+
+                    await client.send(
+                        new DeleteObjectCommand({
+                            Bucket: row.bucket.name,
+                            Key: oldFilename,
+                        }),
+                    );
+
+                    return new Response(null, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        status: 204,
+                    });
+                } catch (error) {
+                    console.error("Error renaming object:", error);
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Error renaming object",
                                 null,
                             ),
                         ),
