@@ -143,7 +143,14 @@ function RouteComponent() {
                     params={{ providerId: providerId, bucketId: bucket.id }}
                     key={bucket.id}
                 >
-                    <Button type="button" key={bucket.id}>
+                    <Button
+                        type="button"
+                        key={bucket.id}
+                        disabled={
+                            isLoading || isRefetching || isManualRefetching
+                        }
+                        className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                    >
                         <h3>{bucket.name}</h3>
                     </Button>
                 </Link>
@@ -154,7 +161,13 @@ function RouteComponent() {
                     {errorMsg || "Error fetching S3 accounts"}
                 </p>
             )}
-            <Button onClick={handleCreateBucket}>Create bucket</Button>
+            <Button
+                onClick={handleCreateBucket}
+                disabled={isLoading || isRefetching || isManualRefetching}
+                className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+            >
+                Create bucket
+            </Button>
             <Button
                 onClick={handleRefetchBuckets}
                 disabled={isManualRefetching}
