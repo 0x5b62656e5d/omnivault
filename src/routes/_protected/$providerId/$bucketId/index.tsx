@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
+import { FiArrowUpRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
-import { FiArrowUpRight } from "react-icons/fi";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,

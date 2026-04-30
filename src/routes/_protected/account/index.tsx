@@ -5,7 +5,6 @@ import { SiRailway } from "react-icons/si";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import { set } from "zod";
 
 export const Route = createFileRoute("/_protected/account/")({
     component: DashboardLayout,

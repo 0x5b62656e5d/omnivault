@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import {
     createFileRoute,
     Link,
@@ -5,12 +6,11 @@ import {
     redirect,
     useLocation,
 } from "@tanstack/react-router";
-import { getSession } from "@/lib/auth.functions";
-import { Button } from "@/components/ui/button";
-import type { s3credentials } from "@/db/schema";
-import { useQuery } from "@tanstack/react-query";
 import type { InferSelectModel } from "drizzle-orm";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import type { s3credentials } from "@/db/schema";
+import { getSession } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/_protected")({
     beforeLoad: async ({ location }) => {

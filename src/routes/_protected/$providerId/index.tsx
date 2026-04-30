@@ -4,11 +4,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { InferSelectModel } from "drizzle-orm";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { FiArrowUpRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
+import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import type { s3buckets } from "@/db/schema";
-import { FiArrowUpRight } from "react-icons/fi";
-import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
     component: RouteComponent,
