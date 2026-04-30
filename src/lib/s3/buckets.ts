@@ -66,6 +66,14 @@ export const loadBucketRegions = async (
         return;
     }
 
+    try {
+        await db
+            .delete(s3buckets)
+            .where(eq(s3buckets.parentCredential, credentialId[0].id));
+    } catch (error) {
+        console.error("Error deleting existing buckets for credential:", error);
+    }
+
     for (const bucket of buckets) {
         try {
             const res = await client.send(
