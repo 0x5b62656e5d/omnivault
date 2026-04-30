@@ -114,8 +114,8 @@ export const configureBucketCors = async (client: S3Client, bucket: string) => {
     try {
         const existingCors = await client
             .send(new GetBucketCorsCommand({ Bucket: bucket }))
-            .catch(error => {
-                if (error.name === "NoSuchCORSConfiguration") {
+            .catch((error: S3ServiceException) => {
+                if (error.name.toLowerCase() === "nosuchcorsconfiguration") {
                     return null;
                 }
 
