@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3credentials } from "@/db/schema";
 import { getSession } from "@/lib/auth.functions";
@@ -33,12 +33,16 @@ export const Route = createFileRoute("/api/s3/buckets/refetch/$providerId/")({
                 }
 
                 const { providerId } = params;
-                console.log("providerId", providerId);
 
                 const row = await db
                     .select()
                     .from(s3credentials)
-                    .where(eq(s3credentials.ownedBy, session.user.id))
+                    .where(
+                        and(
+                            eq(s3credentials.ownedBy, session.user.id),
+                            eq(s3credentials.id, providerId),
+                        ),
+                    )
                     .limit(1);
 
                 if (row.length === 0) {
