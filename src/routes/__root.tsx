@@ -10,6 +10,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { IoIosWarning } from "react-icons/io";
 import { NotFound } from "@/components/notFound";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth.functions";
@@ -121,6 +122,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </head>
             <body className="min-h-screen w-full">
                 <div className="flex min-h-screen flex-col">
+                    <div className="flex items-center justify-center gap-2 py-2 bg-orange-500/50">
+                        <IoIosWarning />
+                        <p>
+                            Omnivault is still in development. Account data may
+                            be deleted at any time.
+                        </p>
+                        <IoIosWarning />
+                    </div>
                     <header className="flex justify-between items-center p-4">
                         <div className="flex gap-1">
                             <nav className="flex gap-4 items-center">
