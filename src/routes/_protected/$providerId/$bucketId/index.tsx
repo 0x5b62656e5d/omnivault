@@ -397,7 +397,13 @@ function RouteComponent() {
                     {errorMsg || "Error fetching S3 accounts"}
                 </p>
             )}
-            <Button onClick={handleUploadFile}>Upload file</Button>
+            <Button
+                onClick={handleUploadFile}
+                disabled={isLoading || isRefetching}
+                className={`${isLoading || isRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+            >
+                Upload file
+            </Button>
             <AnimatePresence>
                 {showUploadFileForm && (
                     <motion.div

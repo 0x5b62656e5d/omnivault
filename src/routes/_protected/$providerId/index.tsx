@@ -170,8 +170,8 @@ function RouteComponent() {
             </Button>
             <Button
                 onClick={handleRefetchBuckets}
-                disabled={isManualRefetching}
-                className={`${isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                disabled={isLoading || isRefetching || isManualRefetching}
+                className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
             >
                 {isManualRefetching ? "Refetching..." : "Refetch S3 buckets"}
             </Button>
