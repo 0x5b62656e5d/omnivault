@@ -5,16 +5,16 @@ import {
     type ListBucketsCommandOutput,
     NotFound,
     PutBucketCorsCommand,
-    S3Client,
+    type S3Client,
     S3ServiceException,
 } from "@aws-sdk/client-s3";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3buckets, s3credentials } from "@/db/schema";
+import { env } from "@/env/server";
 import type { S3Credential } from "@/lib/types";
 import { hmacHash } from "../encryption";
 import { createClient } from "./client";
-import { env } from "@/env/server";
 
 const omnivaultRule = {
     ID: "omnivault-browser-access",

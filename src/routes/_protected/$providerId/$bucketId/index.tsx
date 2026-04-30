@@ -218,9 +218,7 @@ function RouteComponent() {
                 console.error(error);
                 if (cancelMultipart) {
                     setErrormsg("S3 multipart upload cancelled");
-                } else if (
-                    (error as string).includes("CORS")
-                ) {
+                } else if ((error as string).includes("CORS")) {
                     setErrormsg(
                         "S3 multipart upload failed: Bucket CORS error",
                     );
