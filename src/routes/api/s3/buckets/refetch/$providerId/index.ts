@@ -85,7 +85,7 @@ export const Route = createFileRoute("/api/s3/buckets/refetch/$providerId/")({
 
                 return new Response(
                     JSON.stringify(
-                        createStandardResponse(false, null, null, null),
+                        createStandardResponse(true, null, null, null),
                     ),
                     {
                         headers: {
