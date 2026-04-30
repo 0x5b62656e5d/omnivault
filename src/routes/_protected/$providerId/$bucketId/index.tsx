@@ -9,6 +9,7 @@ import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
+import { Loader } from "@/components/loader";
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,
