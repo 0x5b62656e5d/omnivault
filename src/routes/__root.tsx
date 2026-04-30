@@ -141,7 +141,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }
                                     className="hover:cursor-pointer"
                                 >
-                                    Dashboard
+                                    <u>Dashboard</u>
                                 </p>
                                 <p
                                     onClick={() =>
@@ -151,7 +151,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }
                                     className="hover:cursor-pointer"
                                 >
-                                    About
+                                    <u>About</u>
+                                </p>
+                                <p
+                                    onClick={() =>
+                                        navigate({
+                                            to: "/account",
+                                        })
+                                    }
+                                    className="hover:cursor-pointer"
+                                >
+                                    <u>Manage account</u>
                                 </p>
                             </nav>
                         </div>
