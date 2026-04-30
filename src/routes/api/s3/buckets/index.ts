@@ -1,4 +1,8 @@
-import { CreateBucketCommand } from "@aws-sdk/client-s3";
+import {
+    CreateBucketCommand,
+    DeleteBucketCommand,
+    ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
 import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -162,6 +166,173 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     },
                     status: 204,
                 });
+            },
+            DELETE: async ({ request }) => {
+                const session = await getSession();
+
+                if (!session) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Unauthorized",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 401,
+                        },
+                    );
+                }
+
+                const body = await request.json();
+                const { providerId, bucketId } = body;
+
+                if (!providerId || !bucketId) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Missing required fields: providerId and bucketName",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 400,
+                        },
+                    );
+                }
+
+                const [row] = await db
+                    .select({
+                        credential: s3credentials,
+                        bucket: s3buckets,
+                    })
+                    .from(s3buckets)
+                    .innerJoin(
+                        s3credentials,
+                        eq(s3buckets.parentCredential, s3credentials.id),
+                    )
+                    .where(
+                        and(
+                            eq(s3buckets.id, bucketId),
+                            eq(s3buckets.parentCredential, providerId),
+                            eq(s3credentials.ownedBy, session.user.id),
+                        ),
+                    )
+                    .limit(1);
+
+                if (!row) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "S3 credential not found",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 404,
+                        },
+                    );
+                }
+
+                const client = createClient(row.credential.region, {
+                    accessKeyId: decrypt(row.credential.accessKeyId),
+                    secretAccessKey: decrypt(row.credential.secretAccessKey),
+                    endpointUrl: row.credential.endpointUrl || undefined,
+                    region: row.credential.region,
+                });
+
+                try {
+                    const objects = await client.send(
+                        new ListObjectsV2Command({
+                            Bucket: row.bucket.name,
+                        }),
+                    );
+
+                    if (objects.Contents && objects.Contents.length > 0) {
+                        return new Response(
+                            JSON.stringify(
+                                createStandardResponse(
+                                    false,
+                                    null,
+                                    "Bucket not empty",
+                                    null,
+                                ),
+                            ),
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                status: 400,
+                            },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Error checking bucket:", error);
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Error checking bucket",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 500,
+                        },
+                    );
+                }
+
+                try {
+                    await client.send(
+                        new DeleteBucketCommand({
+                            Bucket: row.bucket.name,
+                        }),
+                    );
+
+                    return new Response(null, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        status: 204,
+                    });
+                } catch (error) {
+                    console.error("Error deleting bucket:", error);
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Error deleting bucket",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 500,
+                        },
+                    );
+                }
             },
         },
     },

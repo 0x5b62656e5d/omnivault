@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import type { s3buckets } from "@/db/schema";
+import { DeleteButton } from "@/components/deleteButton";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
     component: RouteComponent,
@@ -19,6 +20,9 @@ function RouteComponent() {
     const { providerId } = Route.useParams();
     const [providerName, setProviderName] = useState<string | null>(null);
     const [isManualRefetching, setIsManualRefetching] = useState(false);
+    const [deleteConfirmationId, setDeleteConfirmationId] = useState<
+        string | null
+    >(null);
 
     const form = useForm({
         defaultValues: {
@@ -132,6 +136,38 @@ function RouteComponent() {
         form.reset();
     };
 
+    const handleDeleteBucket = async (bucketId: string) => {
+        if (deleteConfirmationId !== bucketId) {
+            setDeleteConfirmationId(bucketId);
+
+            setTimeout(() => {
+                setDeleteConfirmationId(null);
+            }, 3000);
+
+            return;
+        }
+
+        setDeleteConfirmationId(null);
+
+        const res = await fetch(`/api/s3/buckets`, {
+            method: "DELETE",
+            body: JSON.stringify({ providerId, bucketId }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            setErrormsg("Failed to delete S3 bucket - Err 104");
+            console.error("S3 bucket mgmt error 104");
+            return;
+        }
+
+        queryClient.invalidateQueries({
+            queryKey: ["s3-buckets", providerId],
+        });
+    };
+
     return (
         <div>
             {(isLoading || isRefetching || isManualRefetching) && (
@@ -142,6 +178,11 @@ function RouteComponent() {
                     to="/$providerId/$bucketId"
                     params={{ providerId: providerId, bucketId: bucket.id }}
                     key={bucket.id}
+                            <DeleteButton
+                                onClick={() => handleDeleteBucket(bucket.id)}
+                                deleteConfirmationId={deleteConfirmationId}
+                                idMatcher={bucket.id}
+                            />
                 >
                     <Button
                         type="button"
