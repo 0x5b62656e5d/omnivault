@@ -20,8 +20,8 @@ const omnivaultRule = {
     ID: "omnivault-browser-access",
     AllowedOrigins:
         env.ENVIRONMENT === "production"
-            ? ["https://omnivault.benkou.dev"]
-            : ["http://localhost:3000", "https://omnivault.benkou.dev"],
+            ? [env.BASE_URL]
+            : ["http://localhost:3000", env.BASE_URL],
     AllowedMethods: ["GET", "PUT", "DELETE", "HEAD"],
     ExposeHeaders: ["ETag"],
     AllowedHeaders: [
