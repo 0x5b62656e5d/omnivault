@@ -5,27 +5,35 @@ export const opengraphTags = [
     },
     {
         property: "og:description",
-        content: "",
+        content: "A unified dashboard to manage all your S3-compatible storage services.",
     },
     {
-        property: "og:image:url",
-        content: "",
+        property: "og:url",
+        content: "https://omnivault.benkou.dev",
+    },
+    {
+        property: "og:logo",
+        content: "https://cdn.benkou.dev/omnivault/icon.svg",
+    },
+    {
+        property: "og:image",
+        content: "https://cdn.benkou.dev/omnivault/og.png",
     },
     {
         property: "og:image:alt",
-        content: "",
+        content: "Omnivault",
     },
     {
         property: "og:image:type",
-        content: "",
+        content: "image/png",
     },
     {
         property: "og:image:width",
-        content: "",
+        content: "1200",
     },
     {
         property: "og:image:height",
-        content: "",
+        content: "630",
     },
     {
         property: "og:type",
@@ -48,26 +56,26 @@ export const twitterTags = [
     },
     {
         name: "twitter:description",
-        content: "",
+        content: "A unified dashboard to manage all your S3-compatible storage services.",
     },
     {
         name: "twitter:image:url",
-        content: "",
+        content: "https://cdn.benkou.dev/omnivault/og.png",
     },
     {
         name: "twitter:image:alt",
-        content: "",
+        content: "Omnivault",
     },
     {
         name: "twitter:image:type",
-        content: "",
+        content: "image/png",
     },
     {
         name: "twitter:image:width",
-        content: "",
+        content: "1200",
     },
     {
         name: "twitter:image:height",
-        content: "",
+        content: "630",
     },
 ];

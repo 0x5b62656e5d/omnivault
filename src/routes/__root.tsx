@@ -44,7 +44,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             },
             {
                 name: "description",
-                content: "",
+                content: "A unified dashboard to manage all your S3-compatible storage services.",
             },
             ...opengraphTags,
             ...twitterTags,
