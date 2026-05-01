@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import { FiArrowUpRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
+import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import type { s3buckets } from "@/db/schema";
-import { Loader } from "@/components/loader";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
     component: RouteComponent,
