@@ -10,7 +10,7 @@ function RouteComponent() {
 
     return (
         <div className="flex w-screen min-h-full p-4">
-            <nav className="flex flex-col justify-start items-center gap-2 max-w-40 m-4">
+            <nav className="flex flex-col justify-start items-center gap-2 max-w-44 m-4 pr-4 border-r-2">
                 <p className="text-xl font-medium mb-4">Menu</p>
                 <Button
                     className="w-full"

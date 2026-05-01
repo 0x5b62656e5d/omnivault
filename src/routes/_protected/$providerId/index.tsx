@@ -210,7 +210,12 @@ function RouteComponent() {
                                     className={`hover:cursor-pointer  ${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                                 >
                                     <p className="inline-flex justify-center items-center gap-2 transition-transform duration-250 ease-in-out hover:scale-[1.025]">
-                                        <u>{bucket.name}</u> <FiArrowUpRight />
+                                        <u>
+                                            {bucket.name.length > 25
+                                                ? `${bucket.name.substring(0, 23)}...`
+                                                : bucket.name}
+                                        </u>{" "}
+                                        <FiArrowUpRight />
                                     </p>
                                 </button>
                             </Link>
