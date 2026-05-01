@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiArrowUpRight, FiUpload } from "react-icons/fi";
+import { FiArrowUpRight, FiFolder, FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { RiArrowUpDownFill } from "react-icons/ri";
 import { DeleteButton } from "@/components/deleteButton";
@@ -13,6 +13,22 @@ import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { stripExtension } from "@/lib/fileExtension";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
+
+type DirectoryEntry =
+    | {
+          type: "folder";
+          name: string;
+          key: string;
+          size: 0;
+          isEmpty: boolean;
+      }
+    | {
+          type: "file";
+          name: string;
+          key: string;
+          size: number;
+          file: _Object;
+      };
 
 export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
     component: RouteComponent,
@@ -46,6 +62,7 @@ function RouteComponent() {
         { id: string; name: string }[]
     >([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [currentPrefix, setCurrentPrefix] = useState("");
     const [filterBy, setFilterBy] = useState<"name" | "size">("name");
     const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
     const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(
@@ -404,6 +421,120 @@ function RouteComponent() {
         },
     });
 
+    const directoryEntries = (data || []).reduce<DirectoryEntry[]>(
+        (entries, file) => {
+            const key = file.Key || "";
+
+            if (!key.startsWith(currentPrefix)) {
+                return entries;
+            }
+
+            const relativeKey = key.slice(currentPrefix.length);
+
+            if (!relativeKey) {
+                return entries;
+            }
+
+            const parts = relativeKey.split("/").filter(Boolean);
+
+            if (parts.length === 0) {
+                return entries;
+            }
+
+            if (parts.length > 1) {
+                const folderName = parts[0];
+                const folderKey = `${currentPrefix}${folderName}/`;
+                const folderExists = entries.some(
+                    entry => entry.type === "folder" && entry.key === folderKey,
+                );
+
+                if (!folderExists) {
+                    const folderChildren = (data || []).filter(
+                        child =>
+                            child.Key?.startsWith(folderKey) &&
+                            child.Key !== folderKey,
+                    );
+
+                    entries.push({
+                        type: "folder",
+                        name: folderName,
+                        key: folderKey,
+                        size: 0,
+                        isEmpty: folderChildren.length === 0,
+                    });
+                }
+
+                return entries;
+            }
+
+            if (key.endsWith("/") && (file.Size || 0) === 0) {
+                const folderName = parts[0];
+                const folderKey = `${currentPrefix}${folderName}/`;
+                const folderExists = entries.some(
+                    entry => entry.type === "folder" && entry.key === folderKey,
+                );
+
+                if (!folderExists) {
+                    const folderChildren = (data || []).filter(
+                        child =>
+                            child.Key?.startsWith(folderKey) &&
+                            child.Key !== folderKey,
+                    );
+
+                    entries.push({
+                        type: "folder",
+                        name: folderName,
+                        key: folderKey,
+                        size: 0,
+                        isEmpty: folderChildren.length === 0,
+                    });
+                }
+
+                return entries;
+            }
+
+            entries.push({
+                type: "file",
+                name: parts[0],
+                key,
+                size: file.Size || 0,
+                file,
+            });
+
+            return entries;
+        },
+        [],
+    );
+
+    const filteredDirectoryEntries = directoryEntries
+        .filter(entry =>
+            entry.name
+                .toLowerCase()
+                .includes(debouncedSearchQuery.toLowerCase()),
+        )
+        .sort((a, b) => {
+            if (a.type !== b.type) {
+                return a.type === "folder" ? -1 : 1;
+            }
+
+            if (debouncedFilterBy === "name") {
+                return (
+                    a.name.localeCompare(b.name) *
+                    (debouncedFilterOrder === "asc" ? 1 : -1)
+                );
+            }
+
+            return (
+                (a.size - b.size) * (debouncedFilterOrder === "asc" ? 1 : -1)
+            );
+        });
+
+    const currentFolderParts = currentPrefix.split("/").filter(Boolean);
+    const getPrefixForBreadcrumbIndex = (index: number) => {
+        const prefix = currentFolderParts.slice(0, index + 1).join("/");
+        return prefix ? `${prefix}/` : "";
+    };
+
     const getPresignedUrl = async (fileKey: string) => {
         setErrormsg(null);
         if (!fileKey) {
@@ -612,6 +743,11 @@ function RouteComponent() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
+            <p>
+                Viewing files in:{" "}
+                {bucketList.filter(b => b.id === bucketId)[0]?.name ||
+                    "Unknown Bucket"}
+            </p>
             <div className="flex gap-2 justify-center items-center">
                 <label className="flex flex-col gap-1 w-full">
                     <input
@@ -652,6 +788,48 @@ function RouteComponent() {
                     <RiArrowUpDownFill />
                 </Button>
             </div>
+            <div className="text-sm text-muted-foreground">
+                Current folder: {""}
+                <button
+                    type="button"
+                    className="underline hover:cursor-pointer hover:text-foreground"
+                    onClick={() => {
+                        setCurrentPrefix("");
+                        setSearchQuery("");
+                    }}
+                    disabled={
+                        isDeletingFile ||
+                        isLoading ||
+                        isRefetching ||
+                        isUploading
+                    }
+                >
+                    /
+                </button>
+                {currentFolderParts.map((part, index) => (
+                    <span key={getPrefixForBreadcrumbIndex(index)}>
+                        {index !== 0 && <span>/</span>}
+                        <button
+                            type="button"
+                            className="underline hover:cursor-pointer hover:text-foreground"
+                            onClick={() => {
+                                setCurrentPrefix(
+                                    getPrefixForBreadcrumbIndex(index),
+                                );
+                                setSearchQuery("");
+                            }}
+                            disabled={
+                                isDeletingFile ||
+                                isLoading ||
+                                isRefetching ||
+                                isUploading
+                            }
+                        >
+                            {part}
+                        </button>
+                    </span>
+                ))}
+            </div>
             {(isLoading || isRefetching) && <Loader />}
             <AnimatePresence>
                 {isDragging && (
@@ -666,49 +844,55 @@ function RouteComponent() {
                     </motion.div>
                 )}
             </AnimatePresence>
-            {data
-                ?.filter(file =>
-                    file.Key?.toLowerCase().includes(
-                        debouncedSearchQuery.toLowerCase(),
-                    ),
-                )
-                .sort((a, b) => {
-                    if (debouncedFilterBy === "name") {
-                        return (
-                            (a.Key || "").localeCompare(b.Key || "") *
-                            (debouncedFilterOrder === "asc" ? 1 : -1)
-                        );
-                    } else {
-                        return (
-                            ((a.Size || 0) - (b.Size || 0)) *
-                            (debouncedFilterOrder === "asc" ? 1 : -1)
-                        );
-                    }
-                })
-                .map((file, idx) => (
-                    <div
-                        key={idx}
-                        className="flex justify-between items-center border-2 p-4"
-                    >
-                        <div className="flex p-4 gap-2">
-                            <p
-                                className="inline-flex hover:cursor-pointer justify-center items-center"
-                                onClick={() =>
-                                    handleGetFilePreview(file.Key || "")
-                                }
+            {filteredDirectoryEntries.map((entry, idx) => (
+                <div
+                    key={entry.key}
+                    className="flex justify-between items-center border-2 p-4"
+                >
+                    <div className="flex p-4 gap-2">
+                        {entry.type === "folder" ? (
+                            <button
+                                type="button"
+                                className="inline-flex hover:cursor-pointer justify-center items-center gap-2"
+                                onClick={() => {
+                                    setCurrentPrefix(entry.key);
+                                    setSearchQuery("");
+                                }}
                             >
-                                <u>{file.Key}</u> <FiArrowUpRight />
-                            </p>
-                            <p>{getFileSizeUnits(file.Size || 0)}</p>
-                        </div>
+                                <FiFolder />
+                                <u>{entry.name}</u>
+                            </button>
+                        ) : (
+                            <>
+                                <p
+                                    className="inline-flex hover:cursor-pointer justify-center items-center"
+                                    onClick={() =>
+                                        handleGetFilePreview(entry.key)
+                                    }
+                                >
+                                    <u>{entry.name}</u> <FiArrowUpRight />
+                                </p>
+                                <p>{getFileSizeUnits(entry.size)}</p>
+                            </>
+                        )}
+                    </div>
+                    {entry.type === "folder" && entry.isEmpty && (
+                        <DeleteButton
+                            onClick={() => deleteFile(entry.key)}
+                            deleteConfirmationId={deleteConfirmationId}
+                            idMatcher={entry.key}
+                            disabled={
+                                isDeletingFile || isLoading || isRefetching
+                            }
+                        />
+                    )}
+                    {entry.type === "file" && (
                         <div className="flex gap-2 items-center">
                             <div className="flex flex-col gap-2">
                                 <Button
                                     type="button"
                                     key={`${idx}-Rename`}
-                                    onClick={() =>
-                                        handleRenameFile(file.Key || "")
-                                    }
+                                    onClick={() => handleRenameFile(entry.key)}
                                     className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                                     disabled={
                                         isDeletingFile ||
@@ -721,9 +905,7 @@ function RouteComponent() {
                                 <Button
                                     type="button"
                                     key={`${idx}-Move`}
-                                    onClick={() =>
-                                        handleMoveFile(file.Key || "")
-                                    }
+                                    onClick={() => handleMoveFile(entry.key)}
                                     className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                                     disabled={
                                         isDeletingFile ||
@@ -739,9 +921,7 @@ function RouteComponent() {
                                 <Button
                                     type="button"
                                     key={`${idx}-Download`}
-                                    onClick={() =>
-                                        getPresignedUrl(file.Key || "")
-                                    }
+                                    onClick={() => getPresignedUrl(entry.key)}
                                     className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                                     disabled={
                                         isDeletingFile ||
@@ -752,9 +932,9 @@ function RouteComponent() {
                                     Download
                                 </Button>
                                 <DeleteButton
-                                    onClick={() => deleteFile(file.Key || "")}
+                                    onClick={() => deleteFile(entry.key)}
                                     deleteConfirmationId={deleteConfirmationId}
-                                    idMatcher={file.Key || ""}
+                                    idMatcher={entry.key}
                                     disabled={
                                         isDeletingFile ||
                                         isLoading ||
@@ -763,9 +943,15 @@ function RouteComponent() {
                                 />
                             </div>
                         </div>
-                    </div>
-                ))}
+                    )}
+                </div>
+            ))}
             {data?.length === 0 && <p>No files found in this bucket.</p>}
+            {data &&
+                data.length > 0 &&
+                filteredDirectoryEntries.length === 0 && (
+                    <p>No files found in this folder.</p>
+                )}
             {errorMsg && (
                 <p className="text-destructive">
                     {errorMsg || "Error fetching S3 accounts"}
@@ -1043,10 +1229,6 @@ function RouteComponent() {
                                 <h2 className="text-xl font-semibold">
                                     Upload File
                                 </h2>
-                                {/* <p className="text-sm text-muted-foreground">
-                                    Add your S3-compatible credentials to
-                                    connect a storage provider.
-                                </p> */}
                             </div>
 
                             <form
