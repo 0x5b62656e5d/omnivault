@@ -1,11 +1,13 @@
 import type { _Object } from "@aws-sdk/client-s3";
 import { useForm } from "@tanstack/react-form";
+import { useDebouncedValue } from "@tanstack/react-pacer";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FiArrowUpRight, FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
+import { RiArrowUpDownFill } from "react-icons/ri";
 import { DeleteButton } from "@/components/deleteButton";
 import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
@@ -43,6 +45,12 @@ function RouteComponent() {
     const [bucketList, setBucketList] = useState<
         { id: string; name: string }[]
     >([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, _debouncer] = useDebouncedValue(searchQuery, {
+        wait: 300,
+    });
+    const [filterBy, setFilterBy] = useState<"name" | "size">("name");
+    const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
 
     useEffect(() => {
         const queryBucketList = queryClient.getQueryData<
@@ -573,6 +581,14 @@ function RouteComponent() {
         }
     };
 
+    const handleFilterByChange = () => {
+        setFilterBy(prev => (prev === "name" ? "size" : "name"));
+    };
+
+    const handleFilterOrderChange = () => {
+        setFilterOrder(prev => (prev === "asc" ? "desc" : "asc"));
+    };
+
     return (
         <div
             className={`relative flex flex-col gap-4 w-[80%] mx-auto rounded p-4 ${isDragging ? "border-4 border-dashed border-primary/50" : ""}`}
@@ -581,6 +597,46 @@ function RouteComponent() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
+            <div className="flex gap-2 justify-center items-center">
+                <label className="flex flex-col gap-1 w-full">
+                    <input
+                        value={searchQuery}
+                        onChange={event => {
+                            setSearchQuery(event.target.value);
+                        }}
+                        placeholder="Search files..."
+                        className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                        disabled={
+                            isDeletingFile ||
+                            isLoading ||
+                            isRefetching ||
+                            isUploading
+                        }
+                    />
+                </label>
+                <Button
+                    onClick={handleFilterByChange}
+                    disabled={
+                        isDeletingFile ||
+                        isLoading ||
+                        isRefetching ||
+                        isUploading
+                    }
+                >
+                    {filterBy === "name" ? "Filter by size" : "Filter by name"}
+                </Button>
+                <Button
+                    onClick={handleFilterOrderChange}
+                    disabled={
+                        isDeletingFile ||
+                        isLoading ||
+                        isRefetching ||
+                        isUploading
+                    }
+                >
+                    <RiArrowUpDownFill />
+                </Button>
+            </div>
             {(isLoading || isRefetching) && <Loader />}
             <AnimatePresence>
                 {isDragging && (
@@ -595,70 +651,105 @@ function RouteComponent() {
                     </motion.div>
                 )}
             </AnimatePresence>
-            {data?.map((file, idx) => (
-                <div
-                    key={idx}
-                    className="flex justify-between items-center border-2 p-4"
-                >
-                    <div className="flex p-4 gap-2">
-                        <p
-                            className="inline-flex hover:cursor-pointer justify-center items-center"
-                            onClick={() => handleGetFilePreview(file.Key || "")}
-                        >
-                            <u>{file.Key}</u> <FiArrowUpRight />
-                        </p>
-                        <p>{getFileSizeUnits(file.Size || 0)}</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                type="button"
-                                key={`${idx}-Rename`}
-                                onClick={() => handleRenameFile(file.Key || "")}
-                                className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                disabled={
-                                    isDeletingFile || isLoading || isRefetching
+            {data
+                ?.filter(file =>
+                    file.Key?.toLowerCase().includes(
+                        debouncedSearchQuery.toLowerCase(),
+                    ),
+                )
+                .sort((a, b) => {
+                    if (filterBy === "name") {
+                        return (
+                            (a.Key || "").localeCompare(b.Key || "") *
+                            (filterOrder === "asc" ? 1 : -1)
+                        );
+                    } else {
+                        return (
+                            ((a.Size || 0) - (b.Size || 0)) *
+                            (filterOrder === "asc" ? 1 : -1)
+                        );
+                    }
+                })
+                .map((file, idx) => (
+                    <div
+                        key={idx}
+                        className="flex justify-between items-center border-2 p-4"
+                    >
+                        <div className="flex p-4 gap-2">
+                            <p
+                                className="inline-flex hover:cursor-pointer justify-center items-center"
+                                onClick={() =>
+                                    handleGetFilePreview(file.Key || "")
                                 }
                             >
-                                Rename
-                            </Button>
-                            <Button
-                                type="button"
-                                key={`${idx}-Move`}
-                                onClick={() => handleMoveFile(file.Key || "")}
-                                className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                disabled={
-                                    isDeletingFile || isLoading || isRefetching
-                                }
-                                variant="secondary"
-                            >
-                                Move
-                            </Button>
+                                <u>{file.Key}</u> <FiArrowUpRight />
+                            </p>
+                            <p>{getFileSizeUnits(file.Size || 0)}</p>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                type="button"
-                                key={`${idx}-Download`}
-                                onClick={() => getPresignedUrl(file.Key || "")}
-                                className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                disabled={
-                                    isDeletingFile || isLoading || isRefetching
-                                }
-                            >
-                                Download
-                            </Button>
-                            <DeleteButton
-                                onClick={() => deleteFile(file.Key || "")}
-                                deleteConfirmationId={deleteConfirmationId}
-                                idMatcher={file.Key || ""}
-                                disabled={
-                                    isDeletingFile || isLoading || isRefetching
-                                }
-                            />
+                        <div className="flex gap-2 items-center">
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    type="button"
+                                    key={`${idx}-Rename`}
+                                    onClick={() =>
+                                        handleRenameFile(file.Key || "")
+                                    }
+                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                    disabled={
+                                        isDeletingFile ||
+                                        isLoading ||
+                                        isRefetching
+                                    }
+                                >
+                                    Rename
+                                </Button>
+                                <Button
+                                    type="button"
+                                    key={`${idx}-Move`}
+                                    onClick={() =>
+                                        handleMoveFile(file.Key || "")
+                                    }
+                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                    disabled={
+                                        isDeletingFile ||
+                                        isLoading ||
+                                        isRefetching
+                                    }
+                                    variant="secondary"
+                                >
+                                    Move
+                                </Button>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    type="button"
+                                    key={`${idx}-Download`}
+                                    onClick={() =>
+                                        getPresignedUrl(file.Key || "")
+                                    }
+                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                    disabled={
+                                        isDeletingFile ||
+                                        isLoading ||
+                                        isRefetching
+                                    }
+                                >
+                                    Download
+                                </Button>
+                                <DeleteButton
+                                    onClick={() => deleteFile(file.Key || "")}
+                                    deleteConfirmationId={deleteConfirmationId}
+                                    idMatcher={file.Key || ""}
+                                    disabled={
+                                        isDeletingFile ||
+                                        isLoading ||
+                                        isRefetching
+                                    }
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
             {data?.length === 0 && <p>No files found in this bucket.</p>}
             {errorMsg && (
                 <p className="text-destructive">
