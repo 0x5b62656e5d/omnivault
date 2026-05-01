@@ -122,7 +122,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </head>
             <body className="min-h-screen w-full">
                 <div className="flex min-h-screen flex-col">
-                    <div className="flex items-center justify-center gap-2 py-2 bg-orange-500/50">
+                    <div className="flex items-center justify-center gap-2 py-2 bg-orange-400/50">
                         <IoIosWarning />
                         <p>
                             Omnivault is still in development. Account data may
