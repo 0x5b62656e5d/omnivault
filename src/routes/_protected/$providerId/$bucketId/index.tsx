@@ -48,15 +48,24 @@ function RouteComponent() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterBy, setFilterBy] = useState<"name" | "size">("name");
     const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
-    const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(searchQuery, {
-        wait: 300,
-    });
-    const [debouncedFilterBy, _filterByDebouncer] = useDebouncedValue(filterBy, {
-        wait: 300,
-    });
-    const [debouncedFilterOrder, _filterOrderDebouncer] = useDebouncedValue(filterOrder, {
-        wait: 300,
-    });
+    const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(
+        searchQuery,
+        {
+            wait: 300,
+        },
+    );
+    const [debouncedFilterBy, _filterByDebouncer] = useDebouncedValue(
+        filterBy,
+        {
+            wait: 300,
+        },
+    );
+    const [debouncedFilterOrder, _filterOrderDebouncer] = useDebouncedValue(
+        filterOrder,
+        {
+            wait: 300,
+        },
+    );
 
     useEffect(() => {
         const queryBucketList = queryClient.getQueryData<

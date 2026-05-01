@@ -5,7 +5,8 @@ export const opengraphTags = [
     },
     {
         property: "og:description",
-        content: "A unified dashboard to manage all your S3-compatible storage services.",
+        content:
+            "A unified dashboard to manage all your S3-compatible storage services.",
     },
     {
         property: "og:url",
@@ -56,7 +57,8 @@ export const twitterTags = [
     },
     {
         name: "twitter:description",
-        content: "A unified dashboard to manage all your S3-compatible storage services.",
+        content:
+            "A unified dashboard to manage all your S3-compatible storage services.",
     },
     {
         name: "twitter:image:url",
