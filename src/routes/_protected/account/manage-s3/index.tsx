@@ -248,7 +248,9 @@ function RouteComponent() {
                                             onChange: ({ value }) => {
                                                 if (!value.trim()) {
                                                     return "Name is required";
-                                                } else if (value.trim().length > 15) {
+                                                } else if (
+                                                    value.trim().length > 15
+                                                ) {
                                                     return "Name must be less than 15 characters";
                                                 }
 
