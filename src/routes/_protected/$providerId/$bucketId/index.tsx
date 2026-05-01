@@ -46,11 +46,17 @@ function RouteComponent() {
         { id: string; name: string }[]
     >([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedSearchQuery, _debouncer] = useDebouncedValue(searchQuery, {
-        wait: 300,
-    });
     const [filterBy, setFilterBy] = useState<"name" | "size">("name");
     const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
+    const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(searchQuery, {
+        wait: 300,
+    });
+    const [debouncedFilterBy, _filterByDebouncer] = useDebouncedValue(filterBy, {
+        wait: 300,
+    });
+    const [debouncedFilterOrder, _filterOrderDebouncer] = useDebouncedValue(filterOrder, {
+        wait: 300,
+    });
 
     useEffect(() => {
         const queryBucketList = queryClient.getQueryData<
@@ -658,15 +664,15 @@ function RouteComponent() {
                     ),
                 )
                 .sort((a, b) => {
-                    if (filterBy === "name") {
+                    if (debouncedFilterBy === "name") {
                         return (
                             (a.Key || "").localeCompare(b.Key || "") *
-                            (filterOrder === "asc" ? 1 : -1)
+                            (debouncedFilterOrder === "asc" ? 1 : -1)
                         );
                     } else {
                         return (
                             ((a.Size || 0) - (b.Size || 0)) *
-                            (filterOrder === "asc" ? 1 : -1)
+                            (debouncedFilterOrder === "asc" ? 1 : -1)
                         );
                     }
                 })
