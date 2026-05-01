@@ -262,7 +262,7 @@ function RouteComponent() {
                 }),
             });
 
-            form.reset();
+            renameForm.reset();
 
             if (!res.ok) {
                 console.error("S3 file mgmt error 101");
@@ -389,7 +389,7 @@ function RouteComponent() {
 
     const handleCloseRenameForm = () => {
         setShowRenameForm(false);
-        form.reset();
+        renameForm.reset();
     };
 
     const handleCloseUploadFileForm = async () => {
