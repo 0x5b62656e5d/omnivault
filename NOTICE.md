@@ -1,5 +1,7 @@
 Loader animation from uiverse.io
+
 Author: Nawsome
+
 Source: https://uiverse.io/Nawsome/slimy-tiger-93
 
 MIT License
