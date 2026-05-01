@@ -9,6 +9,7 @@ import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
 import type { s3buckets } from "@/db/schema";
+import { Loader } from "@/components/loader";
 
 export const Route = createFileRoute("/_protected/$providerId/")({
     component: RouteComponent,
@@ -183,7 +184,7 @@ function RouteComponent() {
             <div className="flex flex-col w-xl self-center gap-4">
                 <div className="flex flex-col w-full gap-2">
                     {(isLoading || isRefetching || isManualRefetching) && (
-                        <div className="self-center h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                        <Loader />
                     )}
                     {data?.map(bucket => (
                         <div
