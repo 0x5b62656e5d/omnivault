@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FiArrowUpRight, FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { DeleteButton } from "@/components/deleteButton";
 import { Loader } from "@/components/loader";
@@ -37,6 +37,8 @@ function RouteComponent() {
     const [isDeletingFile, setIsDeletingFile] = useState(false);
     const [showRenameForm, setShowRenameForm] = useState(false);
     const [oldFilename, setOldFilename] = useState<string>("");
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const form = useForm({
         defaultValues: {
@@ -456,9 +458,57 @@ function RouteComponent() {
         window.open(json.data, "_blank", "noopener,noreferrer");
     };
 
+    const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setIsDragging(false);
+        }
+    };
+
+    const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+    };
+
+    const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        setIsDragging(false);
+        const files = event.dataTransfer.files;
+
+        if (files.length > 0) {
+            const file = files[0];
+            form.setFieldValue("file", file);
+            setShowUploadFileForm(true);
+        }
+    };
+
     return (
-        <div className="flex flex-col gap-4 w-[80%] mx-auto">
+        <div
+            className={`relative flex flex-col gap-4 w-[80%] mx-auto rounded p-4 ${isDragging ? "border-4 border-dashed border-primary/50" : ""}`}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+        >
             {(isLoading || isRefetching) && <Loader />}
+            <AnimatePresence>
+                {isDragging && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 flex w-full h-full justify-center items-center bg-primary/20 backdrop-blur-xs"
+                    >
+                        <p className="text-2xl font-medium">Drop files here</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {data?.map((file, idx) => (
                 <div
                     key={idx}
@@ -695,34 +745,100 @@ function RouteComponent() {
                                         },
                                     }}
                                 >
-                                    {field => (
-                                        <label className="flex flex-col gap-1">
-                                            <span className="text-sm font-medium">
-                                                File
-                                            </span>
-                                            <input
-                                                type="file"
-                                                onBlur={field.handleBlur}
-                                                onChange={event => {
-                                                    const file =
-                                                        event.target
-                                                            .files?.[0] || null;
+                                    {field => {
+                                        return (
+                                            <>
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-sm font-medium">
+                                                        File
+                                                    </span>
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        onBlur={
+                                                            field.handleBlur
+                                                        }
+                                                        onChange={event => {
+                                                            const file =
+                                                                event.target
+                                                                    .files?.[0] ||
+                                                                null;
 
-                                                    field.handleChange(file);
-                                                }}
-                                                placeholder="Personal AWS account"
-                                                className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
-                                            />
-                                            {field.state.meta.errors.length >
-                                                0 && (
-                                                <span className="text-sm text-destructive">
-                                                    {field.state.meta.errors.join(
-                                                        ", ",
-                                                    )}
-                                                </span>
-                                            )}
-                                        </label>
-                                    )}
+                                                            field.handleChange(
+                                                                file,
+                                                            );
+                                                        }}
+                                                        className="hidden"
+                                                    />
+                                                </div>
+                                                {field.state.value ? (
+                                                    <div className="flex items-center justify-between rounded-md border bg-background px-3 py-2">
+                                                        <div className="flex min-w-0 flex-col">
+                                                            <span className="truncate text-sm font-medium">
+                                                                {
+                                                                    field.state
+                                                                        .value
+                                                                        .name
+                                                                }
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {
+                                                                    field.state
+                                                                        .value
+                                                                        .size
+                                                                }{" "}
+                                                                bytes
+                                                            </span>
+                                                        </div>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                field.handleChange(
+                                                                    null,
+                                                                );
+                                                                form.setFieldValue(
+                                                                    "fileName",
+                                                                    "",
+                                                                );
+
+                                                                if (
+                                                                    fileInputRef.current
+                                                                ) {
+                                                                    fileInputRef.current.value =
+                                                                        "";
+                                                                }
+                                                            }}
+                                                            className="rounded-full p-1 transition-transform hover:bg-muted"
+                                                        >
+                                                            <IoClose className="h-5 w-5" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            fileInputRef.current?.click()
+                                                        }
+                                                        className="w-fit gap-2"
+                                                    >
+                                                        <FiUpload className="h-4 w-4" />
+                                                        Choose file
+                                                    </Button>
+                                                )}
+
+                                                {field.state.meta.errors
+                                                    .length > 0 && (
+                                                    <span className="text-sm text-destructive">
+                                                        {field.state.meta.errors.join(
+                                                            ", ",
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </>
+                                        );
+                                    }}
                                 </form.Field>
                                 <form.Field
                                     name="fileName"
@@ -752,8 +868,8 @@ function RouteComponent() {
                                     {field => (
                                         <label className="flex flex-col gap-1">
                                             <span className="text-sm font-medium">
-                                                File name (without extension,
-                                                optional)
+                                                Override file name (without
+                                                extension, optional)
                                             </span>
                                             <input
                                                 value={field.state.value}
