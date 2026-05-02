@@ -540,7 +540,7 @@ function RouteComponent() {
             {filteredDirectoryEntries.map((entry, idx) => (
                 <div
                     key={entry.key}
-                    className="flex justify-between items-center border-2 p-4"
+                    className="rounded flex justify-between items-center border-2 p-4"
                 >
                     <div className="flex p-4 gap-2">
                         {entry.type === "folder" ? (
