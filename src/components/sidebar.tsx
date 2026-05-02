@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { useLayout } from "@/lib/layoutContext";
 import { Loader } from "./loader";
 import { Button } from "./ui/button";
+import { getProviderIcon } from "@/lib/s3/providerIcon";
 
 export const Sidebar = ({
     user,
@@ -111,6 +112,7 @@ export const Sidebar = ({
                     <div className="flex flex-col gap-4 items-start justify-center">
                         {location.pathname.startsWith("/account") ? (
                             <>
+                                <p className="self-center text-xl font-bold mb-2 pt-4 lg:pt-[unset]">
                                     Menu
                                 </p>
                                 <Link
@@ -169,9 +171,13 @@ export const Sidebar = ({
                                         }}
                                         preload={false}
                                     >
-                                        <h3>
+                                        <div className="flex gap-2 justify-start items-center">
+                                            {getProviderIcon(
+                                                account.endpointUrl || "",
+                                                20,
+                                            )}
                                             <u>{account.name}</u>
-                                        </h3>
+                                        </div>
                                     </Link>
                                 ))}
                                 {errorMsg && (
