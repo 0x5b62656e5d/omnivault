@@ -1,9 +1,11 @@
 import type { IconType } from "react-icons";
-import { FaAws, FaCloudflare, FaDigitalOcean } from "react-icons/fa";
+import { FaAws, FaCloudflare, FaDigitalOcean, FaLinode } from "react-icons/fa";
 import { GrStorage } from "react-icons/gr";
 import {
     SiBackblaze,
     SiGooglecloud,
+    SiOvh,
+    SiScaleway,
     SiUpcloud,
     SiVultr,
     SiWasabi,
@@ -20,6 +22,9 @@ export const ICON_LIST: Record<string, IconType> = {
     "upcloudobjects.com": SiUpcloud,
     "vultrobjects.com": SiVultr,
     "wasabisys.com": SiWasabi,
+    "linodeobjects.com": FaLinode,
+    "scw.cloud": SiScaleway,
+    "ovh.net": SiOvh,
 };
 
 export const getProviderIcon = (
