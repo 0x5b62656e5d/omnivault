@@ -88,6 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     const [showAccountMenu, setShowAccountMenu] = useState(true);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement | null>(null);
 
     const toggleAccountMenu = () => {
         setShowAccountMenu(!showAccountMenu);
@@ -100,6 +101,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 !menuRef.current.contains(event.target as Node)
             ) {
                 setShowAccountMenu(true);
+            }
+
+            if (
+                sidebarRef.current &&
+                !sidebarRef.current.contains(event.target as Node)
+            ) {
+                setSidebarOpen(false);
             }
         };
 
@@ -259,7 +267,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             Menu
                         </Button>
                         <main className="flex flex-1 min-h-0">
-                            <Sidebar user={user} />
+                            <Sidebar user={user} ref={sidebarRef} />
                             {children}
                         </main>
                     </div>

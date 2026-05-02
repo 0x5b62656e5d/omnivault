@@ -9,6 +9,7 @@ import { Button } from "./ui/button";
 
 export const Sidebar = ({
     user,
+    ref,
 }: {
     user: {
         id: string;
@@ -19,6 +20,7 @@ export const Sidebar = ({
         name: string;
         image?: string | null | undefined;
     } | null;
+    ref: React.Ref<HTMLElement>;
 }) => {
     const [errorMsg, setErrormsg] = useState<string | null>(null);
     const { sidebarOpen, setSidebarOpen } = useLayout();
@@ -51,6 +53,7 @@ export const Sidebar = ({
     return (
         <nav
             className={`z-20 ${sidebarOpen ? "translate-x-0" : "-translate-x-64"} absolute min-h-full bg-popover lg:bg-[unset] lg:flex transition-transform lg:static lg:translate-x-0 flex-col justify-start items-center gap-2 mt-2 lg:m-4 pl-4 lg:pl-[unset] pr-4 border-t-2 lg:border-t-0 border-r-2`}
+            ref={ref}
         >
             <div className="lg:hidden flex flex-col gap-2 items-center justify-center pb-4 pt-2 lg:pt-[unset] border-b-2">
                 <p className="text-xl font-medium mb-4">Navigation</p>
@@ -91,7 +94,9 @@ export const Sidebar = ({
             <div className="flex flex-col gap-2 items-center justify-center">
                 {location.pathname.startsWith("/account") ? (
                     <>
-                        <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">Menu</p>
+                        <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
+                            Menu
+                        </p>
                         <Button
                             className="w-full"
                             onClick={() => {
