@@ -7,6 +7,7 @@ import { IoClose } from "react-icons/io5";
 import { Loader } from "@/components/loader";
 import { DeleteButton } from "@/components/deleteButton";
 import { Button } from "@/components/ui/button";
+import { getFileSizeUnits } from "@/lib/filesizeUnits";
 
 export const useFileUploadForm = ({
     setErrormsg,
@@ -376,8 +377,7 @@ export const useFileUploadForm = ({
                                                         {field.state.value.name}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {field.state.value.size}{" "}
-                                                        bytes
+                                                        {getFileSizeUnits(field.state.value.size)}
                                                     </span>
                                                 </div>
 
