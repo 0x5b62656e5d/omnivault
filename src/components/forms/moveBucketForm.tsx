@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import type { QueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { IoClose } from "react-icons/io5";
 import { Button } from "../ui/button";
 
@@ -27,6 +28,24 @@ export const MoveBucketForm = ({
     disabled: boolean;
     isUploading: boolean;
 }) => {
+    const menuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node)
+            ) {
+                setShowMoveBucketForm(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [setShowMoveBucketForm]);
+
     const form = useForm({
         defaultValues: {
             destBucketId: "",
@@ -84,6 +103,7 @@ export const MoveBucketForm = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
+                ref={menuRef}
             >
                 <button
                     type="button"
