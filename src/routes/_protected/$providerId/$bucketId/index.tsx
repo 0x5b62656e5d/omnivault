@@ -87,6 +87,7 @@ function RouteComponent() {
         setIsDeletingFile,
         isUploading,
         isDeletingFile,
+        currentPrefix,
     });
 
     useEffect(() => {

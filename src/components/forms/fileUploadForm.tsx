@@ -19,6 +19,7 @@ export const useFileUploadForm = ({
     setIsDeletingFile,
     isUploading,
     isDeletingFile,
+    currentPrefix,
 }: {
     setErrormsg: (msg: string | null) => void;
     setIsUploading: (uploading: boolean) => void;
@@ -29,6 +30,7 @@ export const useFileUploadForm = ({
     setIsDeletingFile: (deleting: boolean) => void;
     isUploading: boolean;
     isDeletingFile: boolean;
+    currentPrefix: string;
 }) => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [uploadedSize, setUploadedSize] = useState(0);
@@ -82,9 +84,11 @@ export const useFileUploadForm = ({
                 ? originalName.slice(originalName.lastIndexOf("."))
                 : "";
 
-            const fileName = value.fileName.trim()
-                ? `${value.fileName.trim()}${extension}`
-                : originalName;
+            const fileName =
+                currentPrefix +
+                (value.fileName.trim()
+                    ? `${value.fileName.trim()}${extension}`
+                    : originalName);
 
             const createUploadRes = await fetch("/api/s3/files", {
                 method: "POST",
