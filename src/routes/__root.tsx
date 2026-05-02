@@ -58,7 +58,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             {
                 name: "keywords",
                 content:
-                    "omnivault, s3, storage, cloud, buckets, self-hosted, storage manager",
+                    "omnivault, s3, storage, cloud, buckets, self-hosted, storage manager, s3 dashboard",
             },
             {
                 name: "robots",
@@ -67,8 +67,17 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ],
         links: [
             {
+                rel: "icon",
+                href: "/icon.svg",
+                type: "image/svg+xml",
+            },
+            {
                 rel: "stylesheet",
                 href: appCss,
+            },
+            {
+                rel: "canonical",
+                href: "https://omnivault.benkou.dev",
             },
         ],
     }),

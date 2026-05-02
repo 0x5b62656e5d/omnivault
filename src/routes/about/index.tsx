@@ -2,6 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FiArrowUpRight } from "react-icons/fi";
 
 export const Route = createFileRoute("/about/")({
+    head: () => ({
+        links: [
+            {
+                rel: "canonical",
+                href: "https://omnivault.benkou.dev/about",
+            },
+        ],
+    }),
     component: RouteComponent,
 });
 
