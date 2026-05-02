@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
-import { Loader } from "@/components/loader";
 import { DeleteButton } from "@/components/deleteButton";
+import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
 
@@ -377,7 +377,10 @@ export const useFileUploadForm = ({
                                                         {field.state.value.name}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {getFileSizeUnits(field.state.value.size)}
+                                                        {getFileSizeUnits(
+                                                            field.state.value
+                                                                .size,
+                                                        )}
                                                     </span>
                                                 </div>
 

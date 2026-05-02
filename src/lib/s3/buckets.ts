@@ -12,8 +12,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { s3buckets, s3credentials } from "@/db/schema";
 import { env } from "@/env/server";
-import type { S3Credential } from "@/lib/types";
 import { hmacHash } from "@/lib/encryption";
+import type { S3Credential } from "@/lib/types";
 import { createClient } from "./client";
 
 const omnivaultRule = {
