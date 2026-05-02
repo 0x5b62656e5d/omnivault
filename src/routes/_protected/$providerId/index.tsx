@@ -285,10 +285,6 @@ function RouteComponent() {
                                 <h2 className="text-xl font-semibold">
                                     Create S3 bucket in {providerName}
                                 </h2>
-                                {/* <p className="text-sm text-muted-foreground">
-                                    Add your S3-compatible credentials to
-                                    connect a storage provider.
-                                </p> */}
                             </div>
 
                             <form
