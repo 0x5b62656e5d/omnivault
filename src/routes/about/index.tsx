@@ -10,11 +10,11 @@ function RouteComponent() {
         <div className="flex w-full min-h-full p-4">
             <div className="flex flex-col w-full items-center gap-4">
                 <h1 className="text-4xl font-medium">About Omnivault</h1>
-                <p>
+                <p className="text-center">
                     This project allows users to manage S3-compatible storage
                     services from different providers in a unified dashboard.
                 </p>
-                <p>
+                <p className="text-center">
                     Read more about the project{" "}
                     <a
                         href="https://benkou.dev/thoughts/omnivault"
