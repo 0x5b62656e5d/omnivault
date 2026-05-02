@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import type { s3credentials } from "@/db/schema";
 import { authClient } from "@/lib/auth-client";
 import { useLayout } from "@/lib/layoutContext";
+import { getProviderIcon } from "@/lib/s3/providerIcon";
 import { Loader } from "./loader";
 import { Button } from "./ui/button";
-import { getProviderIcon } from "@/lib/s3/providerIcon";
 
 export const Sidebar = ({
     user,
@@ -73,9 +73,7 @@ export const Sidebar = ({
             <div
                 className={`lg:hidden relative flex flex-col gap-4 items-start justify-center pb-4 pt-2 lg:pt-[unset] ${user ? "border-b-2" : ""}`}
             >
-                <p className="self-center text-xl font-bold mb-4">
-                    Navigation
-                </p>
+                <p className="self-center text-xl font-bold mb-4">Navigation</p>
                 <Link
                     to="/"
                     onClick={() => {
