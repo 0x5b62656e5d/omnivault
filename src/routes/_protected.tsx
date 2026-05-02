@@ -5,6 +5,7 @@ import {
     Outlet,
     redirect,
     useLocation,
+    useNavigate,
 } from "@tanstack/react-router";
 import type { InferSelectModel } from "drizzle-orm";
 import { useState } from "react";
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_protected")({
 function Component() {
     const [errorMsg, setErrormsg] = useState<string | null>(null);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-accounts"],
@@ -57,46 +59,68 @@ function Component() {
 
     return (
         <div className="flex w-screen min-h-full p-4">
-            {!location.pathname.startsWith("/account") && (
-                <nav className="flex flex-col justify-start items-center gap-2 max-w-40 m-4 pr-4 border-r-2">
-                    <p className="text-xl font-medium mb-4">Providers</p>
-                    {data?.length === 0 && (
-                        <>
-                            <p className="text-center mb-2">
-                                No S3 accounts added yet.
-                            </p>
-                            <Link to="/account/manage-s3">
-                                <Button type="button">Add S3 account</Button>
-                            </Link>
-                        </>
-                    )}
-                    {(isLoading || isRefetching) && <Loader />}
-                    {data?.map(account => (
-                        <Link
-                            to="/$providerId"
-                            params={{ providerId: account.id }}
-                            key={account.id}
+            <nav className="flex flex-col justify-start items-center gap-2 m-4 pr-4 border-r-2">
+                {location.pathname.startsWith("/account") ? (
+                    <>
+                        <p className="text-xl font-medium mb-4">Menu</p>
+                        <Button
                             className="w-full"
-                            activeProps={{
-                                className: "[&>button]:bg-primary/60",
-                            }}
+                            onClick={() => navigate({ to: "/account" })}
                         >
-                            <Button
-                                className="w-full"
-                                type="button"
+                            Manage account
+                        </Button>
+                        <Button
+                            className="w-full"
+                            onClick={() =>
+                                navigate({ to: "/account/manage-s3" })
+                            }
+                        >
+                            Manage S3 accounts
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <p className="text-xl font-medium mb-4">Providers</p>
+                        {data?.length === 0 && (
+                            <>
+                                <p className="text-center mb-2">
+                                    No S3 accounts added yet.
+                                </p>
+                                <Link to="/account/manage-s3">
+                                    <Button type="button">
+                                        Add S3 account
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                        {(isLoading || isRefetching) && <Loader />}
+                        {data?.map(account => (
+                            <Link
+                                to="/$providerId"
+                                params={{ providerId: account.id }}
                                 key={account.id}
+                                className="w-full"
+                                activeProps={{
+                                    className: "[&>button]:bg-primary/60",
+                                }}
                             >
-                                <h3>{account.name}</h3>
-                            </Button>
-                        </Link>
-                    ))}
-                    {errorMsg && (
-                        <p className="text-destructive">
-                            {errorMsg || "Error fetching S3 accounts"}
-                        </p>
-                    )}
-                </nav>
-            )}
+                                <Button
+                                    className="w-full"
+                                    type="button"
+                                    key={account.id}
+                                >
+                                    <h3>{account.name}</h3>
+                                </Button>
+                            </Link>
+                        ))}
+                        {errorMsg && (
+                            <p className="text-destructive">
+                                {errorMsg || "Error fetching S3 accounts"}
+                            </p>
+                        )}
+                    </>
+                )}
+            </nav>
             <div className="w-full">
                 <Outlet />
             </div>

@@ -13,7 +13,6 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
-import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as ApiHealthIndexRouteImport } from './routes/api/health/index'
 import { Route as ProtectedAccountIndexRouteImport } from './routes/_protected/account/index'
 import { Route as ProtectedProviderIdIndexRouteImport } from './routes/_protected/$providerId/index'
@@ -51,20 +50,15 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => ProtectedRoute,
-} as any)
 const ApiHealthIndexRoute = ApiHealthIndexRouteImport.update({
   id: '/api/health/',
   path: '/api/health/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedAccountIndexRoute = ProtectedAccountIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProtectedAccountRoute,
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedProviderIdIndexRoute =
   ProtectedProviderIdIndexRouteImport.update({
@@ -99,9 +93,9 @@ const ApiS3AccountsIndexRoute = ApiS3AccountsIndexRouteImport.update({
 } as any)
 const ProtectedAccountManageS3IndexRoute =
   ProtectedAccountManageS3IndexRouteImport.update({
-    id: '/manage-s3/',
-    path: '/manage-s3/',
-    getParentRoute: () => ProtectedAccountRoute,
+    id: '/account/manage-s3/',
+    path: '/account/manage-s3/',
+    getParentRoute: () => ProtectedRoute,
   } as any)
 const ProtectedProviderIdBucketIdIndexRoute =
   ProtectedProviderIdBucketIdIndexRouteImport.update({
@@ -151,7 +145,6 @@ const ApiS3BucketsRefetchProviderIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
-  '/account': typeof ProtectedAccountRouteWithChildren
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -197,7 +190,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteWithChildren
-  '/_protected/account': typeof ProtectedAccountRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
@@ -223,7 +215,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/account'
     | '/about/'
     | '/signin/'
     | '/api/auth/$'
@@ -268,7 +259,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_protected'
-    | '/_protected/account'
     | '/_protected/'
     | '/about/'
     | '/signin/'
@@ -340,13 +330,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/account': {
-      id: '/_protected/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof ProtectedAccountRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
     '/api/health/': {
       id: '/api/health/'
       path: '/api/health'
@@ -356,10 +339,10 @@ declare module '@tanstack/react-router' {
     }
     '/_protected/account/': {
       id: '/_protected/account/'
-      path: '/'
+      path: '/account'
       fullPath: '/account/'
       preLoaderRoute: typeof ProtectedAccountIndexRouteImport
-      parentRoute: typeof ProtectedAccountRoute
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/$providerId/': {
       id: '/_protected/$providerId/'
@@ -405,10 +388,10 @@ declare module '@tanstack/react-router' {
     }
     '/_protected/account/manage-s3/': {
       id: '/_protected/account/manage-s3/'
-      path: '/manage-s3'
+      path: '/account/manage-s3'
       fullPath: '/account/manage-s3/'
       preLoaderRoute: typeof ProtectedAccountManageS3IndexRouteImport
-      parentRoute: typeof ProtectedAccountRoute
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/$providerId/$bucketId/': {
       id: '/_protected/$providerId/$bucketId/'
@@ -469,31 +452,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ProtectedAccountRouteChildren {
+interface ProtectedRouteChildren {
+  ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedProviderIdIndexRoute: typeof ProtectedProviderIdIndexRoute
   ProtectedAccountIndexRoute: typeof ProtectedAccountIndexRoute
+  ProtectedProviderIdBucketIdIndexRoute: typeof ProtectedProviderIdBucketIdIndexRoute
   ProtectedAccountManageS3IndexRoute: typeof ProtectedAccountManageS3IndexRoute
 }
 
-const ProtectedAccountRouteChildren: ProtectedAccountRouteChildren = {
-  ProtectedAccountIndexRoute: ProtectedAccountIndexRoute,
-  ProtectedAccountManageS3IndexRoute: ProtectedAccountManageS3IndexRoute,
-}
-
-const ProtectedAccountRouteWithChildren =
-  ProtectedAccountRoute._addFileChildren(ProtectedAccountRouteChildren)
-
-interface ProtectedRouteChildren {
-  ProtectedAccountRoute: typeof ProtectedAccountRouteWithChildren
-  ProtectedIndexRoute: typeof ProtectedIndexRoute
-  ProtectedProviderIdIndexRoute: typeof ProtectedProviderIdIndexRoute
-  ProtectedProviderIdBucketIdIndexRoute: typeof ProtectedProviderIdBucketIdIndexRoute
-}
-
 const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedAccountRoute: ProtectedAccountRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedProviderIdIndexRoute: ProtectedProviderIdIndexRoute,
+  ProtectedAccountIndexRoute: ProtectedAccountIndexRoute,
   ProtectedProviderIdBucketIdIndexRoute: ProtectedProviderIdBucketIdIndexRoute,
+  ProtectedAccountManageS3IndexRoute: ProtectedAccountManageS3IndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
