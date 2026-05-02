@@ -116,7 +116,7 @@ function RouteComponent() {
 
             setBucketList(json.data);
         })();
-    });
+    }, [providerId, queryClient.getQueryData]);
 
     const form = useForm({
         defaultValues: {
