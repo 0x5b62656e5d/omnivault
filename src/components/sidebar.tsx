@@ -91,7 +91,7 @@ export const Sidebar = ({
             <div className="flex flex-col gap-2 items-center justify-center">
                 {location.pathname.startsWith("/account") ? (
                     <>
-                        <p className="text-xl font-medium mb-4">Menu</p>
+                        <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">Menu</p>
                         <Button
                             className="w-full"
                             onClick={() => {
