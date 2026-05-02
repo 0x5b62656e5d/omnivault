@@ -89,6 +89,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const sidebarRef = useRef<HTMLDivElement | null>(null);
+    const sidebarButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const toggleAccountMenu = () => {
         setShowAccountMenu(!showAccountMenu);
@@ -105,7 +106,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
             if (
                 sidebarRef.current &&
-                !sidebarRef.current.contains(event.target as Node)
+                !sidebarRef.current.contains(event.target as Node) &&
+                sidebarButtonRef.current &&
+                !sidebarButtonRef.current.contains(event.target as Node)
             ) {
                 setSidebarOpen(false);
             }
@@ -260,6 +263,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             </nav>
                         </header>
                         <Button
+                            ref={sidebarButtonRef}
                             type="button"
                             onClick={toggleSidebar}
                             className="px-4 py-2 m-4 lg:hidden w-fit"
