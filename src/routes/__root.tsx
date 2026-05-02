@@ -12,14 +12,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { IoIosWarning } from "react-icons/io";
 import { NotFound } from "@/components/notFound";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth.functions";
 import { authClient } from "@/lib/auth-client";
+import { LayoutContext } from "@/lib/layoutContext";
 import { opengraphTags, twitterTags } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
-import { LayoutContext } from "@/lib/layoutContext";
-import { Sidebar } from "@/components/sidebar";
 
 interface MyRouterContext {
     queryClient: QueryClient;

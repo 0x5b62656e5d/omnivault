@@ -1,19 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-    createFileRoute,
-    Link,
-    Outlet,
-    redirect,
-    useLocation,
-    useNavigate,
-} from "@tanstack/react-router";
-import type { InferSelectModel } from "drizzle-orm";
-import { useState } from "react";
-import { Loader } from "@/components/loader";
-import { Button } from "@/components/ui/button";
-import type { s3credentials } from "@/db/schema";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { getSession } from "@/lib/auth.functions";
-import { useLayout } from "@/lib/layoutContext";
 
 export const Route = createFileRoute("/_protected")({
     beforeLoad: async ({ location }) => {

@@ -1,11 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import type { InferSelectModel } from "drizzle-orm";
+import { useState } from "react";
 import type { s3credentials } from "@/db/schema";
 import { useLayout } from "@/lib/layoutContext";
-import { useQuery } from "@tanstack/react-query";
-import type { InferSelectModel } from "drizzle-orm";
-import { Button } from "./ui/button";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import { Loader } from "./loader";
+import { Button } from "./ui/button";
 
 export const Sidebar = ({
     user,
@@ -113,7 +113,9 @@ export const Sidebar = ({
                     </>
                 ) : (
                     <>
-                        <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">Providers</p>
+                        <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
+                            Providers
+                        </p>
                         {data?.length === 0 && (
                             <>
                                 <p className="text-center mb-2">

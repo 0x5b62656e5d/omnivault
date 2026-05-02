@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FiArrowUpRight, FiFolder } from "react-icons/fi";
+import { HiDotsHorizontal } from "react-icons/hi";
 import { RiArrowUpDownFill } from "react-icons/ri";
 import { DeleteButton } from "@/components/deleteButton";
 import { useFileRenameForm } from "@/components/forms/fileRenameForm";
@@ -54,6 +55,7 @@ function RouteComponent() {
     >([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPrefix, setCurrentPrefix] = useState("");
+    const [openFileMenuKey, setOpenFileMenuKey] = useState<string | null>(null);
     const [filterBy, setFilterBy] = useState<"name" | "size">("name");
     const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
     const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(
@@ -430,7 +432,7 @@ function RouteComponent() {
 
     return (
         <div
-            className={`relative flex flex-col gap-4 w-[80%] mx-auto rounded p-4 ${isDragging ? "border-4 border-dashed border-primary/50" : ""}`}
+            className={`relative flex flex-col gap-4 w-[95%] lg:w-[80%] mx-auto rounded p-4 ${isDragging ? "border-4 border-dashed border-primary/50" : ""}`}
             onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -466,8 +468,9 @@ function RouteComponent() {
                         isRefetching ||
                         isUploading
                     }
+                    className="max-w-20 text-wrap! h-fit"
                 >
-                    {filterBy === "name" ? "Filter by size" : "Filter by name"}
+                    {filterBy === "name" ? "Filter: name" : "Filter: size"}
                 </Button>
                 <Button
                     onClick={handleFilterOrderChange}
@@ -485,7 +488,7 @@ function RouteComponent() {
                 Current folder: {""}
                 <button
                     type="button"
-                    className="underline hover:cursor-pointer hover:text-foreground"
+                    className="underline hover:cursor-pointer hover:text-foreground px-1"
                     onClick={() => {
                         setCurrentPrefix("");
                         setSearchQuery("");
@@ -504,7 +507,7 @@ function RouteComponent() {
                         {index !== 0 && <span>/</span>}
                         <button
                             type="button"
-                            className="underline hover:cursor-pointer hover:text-foreground"
+                            className="underline hover:cursor-pointer hover:text-foreground px-1"
                             onClick={() => {
                                 setCurrentPrefix(
                                     getPrefixForBreadcrumbIndex(index),
@@ -556,7 +559,7 @@ function RouteComponent() {
                                 <u>{entry.name}</u>
                             </button>
                         ) : (
-                            <>
+                            <div className="flex flex-col gap-1 lg:block">
                                 <p
                                     className="inline-flex hover:cursor-pointer justify-center items-center"
                                     onClick={() =>
@@ -566,7 +569,7 @@ function RouteComponent() {
                                     <u>{entry.name}</u> <FiArrowUpRight />
                                 </p>
                                 <p>{getFileSizeUnits(entry.size)}</p>
-                            </>
+                            </div>
                         )}
                     </div>
                     {entry.type === "folder" && entry.isEmpty && (
@@ -580,8 +583,88 @@ function RouteComponent() {
                         />
                     )}
                     {entry.type === "file" && (
-                        <div className="flex gap-2 items-center">
-                            <div className="flex flex-col gap-2">
+                        <div className="relative flex gap-2 items-center">
+                            <Button
+                                type="button"
+                                onClick={() => {
+                                    setOpenFileMenuKey(prev =>
+                                        prev === entry.key ? null : entry.key,
+                                    );
+                                }}
+                                className="lg:hidden"
+                                variant="secondary"
+                                disabled={
+                                    isDeletingFile || isLoading || isRefetching
+                                }
+                            >
+                                <HiDotsHorizontal />
+                            </Button>
+                            {openFileMenuKey === entry.key && (
+                                <div className="absolute right-0 top-full z-20 mt-2 flex min-w-36 flex-col gap-2 rounded-md border bg-background p-2 shadow-lg lg:hidden">
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            handleRenameFile(entry.key);
+                                            setOpenFileMenuKey(null);
+                                        }}
+                                        className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching
+                                        }
+                                    >
+                                        Rename
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            handleMoveFile(entry.key);
+                                            setOpenFileMenuKey(null);
+                                        }}
+                                        className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching
+                                        }
+                                        variant="secondary"
+                                    >
+                                        Move
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            getPresignedUrl(entry.key);
+                                            setOpenFileMenuKey(null);
+                                        }}
+                                        className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching
+                                        }
+                                    >
+                                        Download
+                                    </Button>
+                                    <DeleteButton
+                                        onClick={() => {
+                                            deleteFile(entry.key);
+                                            setOpenFileMenuKey(null);
+                                        }}
+                                        deleteConfirmationId={
+                                            deleteConfirmationId
+                                        }
+                                        idMatcher={entry.key}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching
+                                        }
+                                    />
+                                </div>
+                            )}
+                            <div className="hidden lg:flex flex-col gap-2">
                                 <Button
                                     type="button"
                                     key={`${idx}-Rename`}
@@ -610,7 +693,7 @@ function RouteComponent() {
                                     Move
                                 </Button>
                             </div>
-                            <div className="flex flex-col gap-2">
+                            <div className="hidden lg:flex flex-col gap-2">
                                 <Button
                                     type="button"
                                     key={`${idx}-Download`}

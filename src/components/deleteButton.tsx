@@ -18,7 +18,7 @@ export const DeleteButton = ({
         <Button
             variant="destructive"
             onClick={onClick}
-            className={`min-w-48 overflow-hidden ${disabled ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+            className={`min-w-32 overflow-hidden ${disabled ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
             disabled={disabled}
         >
             <AnimatePresence mode="wait" initial={false}>
@@ -35,7 +35,7 @@ export const DeleteButton = ({
                     className="inline-block"
                 >
                     {deleteConfirmationId === idMatcher
-                        ? "Click again to confirm"
+                        ? "Are you sure?"
                         : btnContent}
                 </motion.span>
             </AnimatePresence>

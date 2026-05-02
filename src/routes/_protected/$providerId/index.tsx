@@ -181,7 +181,7 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col">
-            <div className="flex flex-col w-xl self-center gap-4">
+            <div className="flex flex-col w-[90%] lg:w-xl self-center gap-4">
                 <div className="flex flex-col w-full gap-2">
                     {(isLoading || isRefetching || isManualRefetching) && (
                         <Loader />
