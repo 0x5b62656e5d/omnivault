@@ -18,6 +18,8 @@ import { authClient } from "@/lib/auth-client";
 import { opengraphTags, twitterTags } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
+import { LayoutContext } from "@/lib/layoutContext";
+import { Sidebar } from "@/components/sidebar";
 
 interface MyRouterContext {
     queryClient: QueryClient;
@@ -85,6 +87,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     const { user } = Route.useLoaderData();
     const [showAccountMenu, setShowAccountMenu] = useState(true);
     const menuRef = useRef<HTMLDivElement | null>(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const toggleAccountMenu = () => {
         setShowAccountMenu(!showAccountMenu);
@@ -116,129 +119,164 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         navigate({ to: "/signin" });
     };
 
+    const toggleSidebar = () => {
+        setSidebarOpen(prev => !prev);
+    };
+
     return (
         <html lang="en">
             <head>
                 <HeadContent />
             </head>
             <body className="min-h-screen w-full">
-                <div className="flex min-h-screen flex-col">
-                    <div className="flex items-center justify-center gap-2 py-2 bg-orange-400/50">
-                        <IoIosWarning />
-                        <p>
-                            Omnivault is still in development. Account data may
-                            be deleted at any time.
-                        </p>
-                        <IoIosWarning />
-                    </div>
-                    <header className="flex justify-between items-center p-4">
-                        <div className="flex gap-1">
-                            <nav className="flex gap-4 items-center">
-                                <p
-                                    onClick={() =>
-                                        navigate({
-                                            to: "/",
-                                        })
-                                    }
-                                    className="hover:cursor-pointer"
-                                >
-                                    <u>Dashboard</u>
-                                </p>
-                                <p
-                                    onClick={() =>
-                                        navigate({
-                                            to: "/about",
-                                        })
-                                    }
-                                    className="hover:cursor-pointer"
-                                >
-                                    <u>About</u>
-                                </p>
-                                <p
-                                    onClick={() =>
-                                        navigate({
-                                            to: "/account",
-                                        })
-                                    }
-                                    className="hover:cursor-pointer"
-                                >
-                                    <u>Manage account</u>
-                                </p>
-                            </nav>
-                        </div>
-                        <nav className="flex gap-1">
-                            {user ? (
-                                <div ref={menuRef} className="relative">
-                                    <div
-                                        onClick={toggleAccountMenu}
-                                        className="hover:cursor-pointer flex flex-col justify-start items-center gap-1"
-                                    >
-                                        <p className="text-sm">Logged in as</p>
-                                        <div className="flex gap-1 items-center">
-                                            <img
-                                                src={user.image || ""}
-                                                alt={user.name}
-                                                className="rounded-full size-10"
-                                            />
-                                            <p className="text-xl">
-                                                {user.name}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <AnimatePresence>
-                                        {!showAccountMenu && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -8 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -8 }}
-                                                transition={{ duration: 0.15 }}
-                                                className="absolute flex flex-col gap-1 right-0 top-full mt-2"
-                                            >
-                                                <Button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setShowAccountMenu(
-                                                            true,
-                                                        );
-                                                        navigate({
-                                                            to: "/account",
-                                                        });
-                                                    }}
-                                                >
-                                                    Manage account
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    onClick={handleSignout}
-                                                >
-                                                    Sign out
-                                                </Button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            ) : (
-                                <Button type="button" onClick={handleSignin}>
-                                    Sign in
-                                </Button>
-                            )}
-                        </nav>
-                    </header>
-                    <main className="flex flex-1 min-h-0">{children}</main>
-                </div>
-                <TanStackDevtools
-                    config={{
-                        position: "bottom-right",
+                <LayoutContext.Provider
+                    value={{
+                        sidebarOpen,
+                        setSidebarOpen,
+                        toggleSidebar,
                     }}
-                    plugins={[
-                        {
-                            name: "Tanstack Router",
-                            render: <TanStackRouterDevtoolsPanel />,
-                        },
-                        TanStackQueryDevtools,
-                    ]}
-                />
-                <Scripts />
+                >
+                    <div className="flex min-h-screen flex-col">
+                        <div className="flex items-center justify-center gap-2 py-2 px-4 text-center bg-orange-400/50">
+                            <IoIosWarning />
+                            <p>
+                                Omnivault is still in development. Account data
+                                may be deleted at any time.
+                            </p>
+                            <IoIosWarning />
+                        </div>
+                        <header className="hidden lg:flex justify-between items-center p-4">
+                            <div className="flex gap-1">
+                                <nav className="flex gap-4 items-center">
+                                    <p
+                                        onClick={() =>
+                                            navigate({
+                                                to: "/",
+                                            })
+                                        }
+                                        className="hover:cursor-pointer"
+                                    >
+                                        <u>Dashboard</u>
+                                    </p>
+                                    <p
+                                        onClick={() =>
+                                            navigate({
+                                                to: "/about",
+                                            })
+                                        }
+                                        className="hover:cursor-pointer"
+                                    >
+                                        <u>About</u>
+                                    </p>
+                                    <p
+                                        onClick={() =>
+                                            navigate({
+                                                to: "/account",
+                                            })
+                                        }
+                                        className="hover:cursor-pointer"
+                                    >
+                                        <u>Manage account</u>
+                                    </p>
+                                </nav>
+                            </div>
+                            <nav className="flex gap-1">
+                                {user ? (
+                                    <div ref={menuRef} className="relative">
+                                        <div
+                                            onClick={toggleAccountMenu}
+                                            className="hover:cursor-pointer flex flex-col justify-start items-center gap-1"
+                                        >
+                                            <p className="text-sm">
+                                                Logged in as
+                                            </p>
+                                            <div className="flex gap-1 items-center">
+                                                <img
+                                                    src={user.image || ""}
+                                                    alt={user.name}
+                                                    className="rounded-full size-10"
+                                                />
+                                                <p className="text-xl">
+                                                    {user.name}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <AnimatePresence>
+                                            {!showAccountMenu && (
+                                                <motion.div
+                                                    initial={{
+                                                        opacity: 0,
+                                                        y: -8,
+                                                    }}
+                                                    animate={{
+                                                        opacity: 1,
+                                                        y: 0,
+                                                    }}
+                                                    exit={{ opacity: 0, y: -8 }}
+                                                    transition={{
+                                                        duration: 0.15,
+                                                    }}
+                                                    className="absolute flex flex-col gap-1 right-0 top-full mt-2"
+                                                >
+                                                    <Button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setShowAccountMenu(
+                                                                true,
+                                                            );
+                                                            navigate({
+                                                                to: "/account",
+                                                            });
+                                                        }}
+                                                    >
+                                                        Manage account
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        onClick={handleSignout}
+                                                    >
+                                                        Sign out
+                                                    </Button>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        type="button"
+                                        onClick={handleSignin}
+                                    >
+                                        Sign in
+                                    </Button>
+                                )}
+                            </nav>
+                        </header>
+                        <Button
+                            type="button"
+                            onClick={toggleSidebar}
+                            className="px-4 py-2 m-4 lg:hidden w-fit"
+                        >
+                            Menu
+                        </Button>
+                        <main className="flex flex-1 min-h-0">
+                            <Sidebar user={user} />
+                            {children}
+                        </main>
+                    </div>
+                    <TanStackDevtools
+                        config={{
+                            position: "bottom-right",
+                        }}
+                        plugins={[
+                            {
+                                name: "Tanstack Router",
+                                render: <TanStackRouterDevtoolsPanel />,
+                            },
+                            TanStackQueryDevtools,
+                        ]}
+                    />
+                    <Scripts />
+                </LayoutContext.Provider>
             </body>
         </html>
     );
