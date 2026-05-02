@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_protected")({
 function Component() {
     return (
         <div className="relative flex flex-col lg:flex-row w-full min-h-full p-4">
-            <div className="w-full">
+            <div className="w-full pt-4">
                 <Outlet />
             </div>
         </div>

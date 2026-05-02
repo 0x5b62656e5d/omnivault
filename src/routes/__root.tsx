@@ -165,7 +165,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             </p>
                             <IoIosWarning />
                         </div>
-                        <header className="hidden lg:flex justify-between items-center p-4">
+                        <header className="hidden lg:flex justify-between items-center py-4 px-6 border-b-2">
                             <div className="flex gap-1">
                                 <nav className="flex gap-4 items-center">
                                     <p
