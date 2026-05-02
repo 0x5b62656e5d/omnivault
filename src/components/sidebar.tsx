@@ -66,13 +66,15 @@ export const Sidebar = ({
 
     return (
         <nav
-            className={`z-20 ${sidebarOpen ? "translate-x-0" : "-translate-x-64"} fixed lg:shrink-0 top-36 bottom-0 overflow-y-auto bg-popover lg:bg-[unset] lg:flex transition-transform lg:static lg:translate-x-0 flex-col justify-start items-center gap-2 lg:m-4 pl-4 lg:pl-[unset] pr-4 border-t-2 lg:border-t-0 ${(user && screenWidth > 1024) || screenWidth <= 1024 ? "border-r-2" : ""}`}
+            className={`z-20 ${sidebarOpen ? "translate-x-0" : "-translate-x-64"} fixed lg:shrink-0 top-36 bottom-0 overflow-y-auto bg-popover lg:bg-[unset] lg:flex transition-transform lg:static lg:translate-x-0 flex-col justify-start items-center gap-2 lg:m-4 px-6 lg:px-2 lg:pr-4 border-t-2 lg:border-t-0 ${(user && screenWidth > 1024) || screenWidth <= 1024 ? "border-r-2" : ""}`}
             ref={ref}
         >
             <div
-                className={`lg:hidden relative flex flex-col gap-2 items-center justify-center pb-4 pt-2 lg:pt-[unset] ${user ? "border-b-2" : ""}`}
+                className={`lg:hidden relative flex flex-col gap-4 items-start justify-center pb-4 pt-2 lg:pt-[unset] ${user ? "border-b-2" : ""}`}
             >
-                <p className="text-xl font-medium mb-4">Navigation</p>
+                <p className="self-center text-xl font-medium mb-4">
+                    Navigation
+                </p>
                 <Link
                     to="/"
                     onClick={() => {
@@ -106,10 +108,10 @@ export const Sidebar = ({
             </div>
             {user && (
                 <>
-                    <div className="flex flex-col gap-2 items-center justify-center">
+                    <div className="flex flex-col gap-4 items-start justify-center">
                         {location.pathname.startsWith("/account") ? (
                             <>
-                                <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
+                                <p className="self-center text-xl font-medium mb-2 pt-4 lg:pt-[unset]">
                                     Menu
                                 </p>
                                 <Link
@@ -119,9 +121,7 @@ export const Sidebar = ({
                                     }}
                                     preload={false}
                                 >
-                                    <Button className="w-full">
-                                        Manage account
-                                    </Button>
+                                    <u>Manage account</u>
                                 </Link>
                                 <Link
                                     to="/account/manage-s3"
@@ -130,14 +130,12 @@ export const Sidebar = ({
                                     }}
                                     preload={false}
                                 >
-                                    <Button className="w-full">
-                                        Manage S3 accounts
-                                    </Button>
+                                    <u>Manage S3 accounts</u>
                                 </Link>
                             </>
                         ) : (
                             <>
-                                <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
+                                <p className="self-center text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
                                     Providers
                                 </p>
                                 {data?.length === 0 && (
@@ -152,9 +150,7 @@ export const Sidebar = ({
                                             }}
                                             preload={false}
                                         >
-                                            <Button type="button">
-                                                Add S3 account
-                                            </Button>
+                                            <u>Add S3 account</u>
                                         </Link>
                                     </>
                                 )}
@@ -174,13 +170,9 @@ export const Sidebar = ({
                                         }}
                                         preload={false}
                                     >
-                                        <Button
-                                            className="w-full"
-                                            type="button"
-                                            key={account.id}
-                                        >
-                                            <h3>{account.name}</h3>
-                                        </Button>
+                                        <h3>
+                                            <u>{account.name}</u>
+                                        </h3>
                                     </Link>
                                 ))}
                                 {errorMsg && (
