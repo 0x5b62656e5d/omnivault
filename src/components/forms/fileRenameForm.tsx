@@ -3,7 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { IoClose } from "react-icons/io5";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export const useFileRenameForm = ({
     setShowRenameForm,

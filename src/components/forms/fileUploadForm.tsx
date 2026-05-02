@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { Loader } from "@/components/loader";
-import { DeleteButton } from "../deleteButton";
-import { Button } from "../ui/button";
+import { DeleteButton } from "@/components/deleteButton";
+import { Button } from "@/components/ui/button";
 
 export const useFileUploadForm = ({
     setErrormsg,

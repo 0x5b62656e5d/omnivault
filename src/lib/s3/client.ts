@@ -1,5 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import type { S3Credential } from "../types";
+import type { S3Credential } from "@/lib/types";
 
 export const createClient = (region: string, s3Credential: S3Credential) => {
     return new S3Client({
