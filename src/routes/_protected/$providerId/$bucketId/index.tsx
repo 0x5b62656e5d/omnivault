@@ -321,7 +321,7 @@ function RouteComponent() {
         }
 
         setIsDeletingFile(true);
-
+        setOpenFileMenuKey(null);
         setDeleteConfirmationId(null);
 
         setErrormsg(null);
@@ -650,7 +650,6 @@ function RouteComponent() {
                                     <DeleteButton
                                         onClick={() => {
                                             deleteFile(entry.key);
-                                            setOpenFileMenuKey(null);
                                         }}
                                         deleteConfirmationId={
                                             deleteConfirmationId
