@@ -73,39 +73,36 @@ export const Sidebar = ({
                 className={`lg:hidden relative flex flex-col gap-2 items-center justify-center pb-4 pt-2 lg:pt-[unset] ${user ? "border-b-2" : ""}`}
             >
                 <p className="text-xl font-medium mb-4">Navigation</p>
-                <p
+                <Link
+                    to="/"
                     onClick={() => {
                         setSidebarOpen(false);
-                        navigate({
-                            to: "/",
-                        });
                     }}
+                    preload={false}
                     className="hover:cursor-pointer"
                 >
                     <u>Dashboard</u>
-                </p>
-                <p
+                </Link>
+                <Link
+                    to="/about"
                     onClick={() => {
                         setSidebarOpen(false);
-                        navigate({
-                            to: "/about",
-                        });
                     }}
+                    preload={false}
                     className="hover:cursor-pointer"
                 >
                     <u>About</u>
-                </p>
-                <p
+                </Link>
+                <Link
+                    to="/account"
                     onClick={() => {
                         setSidebarOpen(false);
-                        navigate({
-                            to: "/account",
-                        });
                     }}
+                    preload={false}
                     className="hover:cursor-pointer"
                 >
                     <u>Manage account</u>
-                </p>
+                </Link>
             </div>
             {user && (
                 <>
@@ -115,24 +112,28 @@ export const Sidebar = ({
                                 <p className="text-xl font-medium mb-4 pt-4 lg:pt-[unset]">
                                     Menu
                                 </p>
-                                <Button
-                                    className="w-full"
+                                <Link
+                                    to="/account"
                                     onClick={() => {
                                         setSidebarOpen(false);
-                                        navigate({ to: "/account" });
                                     }}
+                                    preload={false}
                                 >
-                                    Manage account
-                                </Button>
-                                <Button
-                                    className="w-full"
+                                    <Button className="w-full">
+                                        Manage account
+                                    </Button>
+                                </Link>
+                                <Link
+                                    to="/account/manage-s3"
                                     onClick={() => {
                                         setSidebarOpen(false);
-                                        navigate({ to: "/account/manage-s3" });
                                     }}
+                                    preload={false}
                                 >
-                                    Manage S3 accounts
-                                </Button>
+                                    <Button className="w-full">
+                                        Manage S3 accounts
+                                    </Button>
+                                </Link>
                             </>
                         ) : (
                             <>
@@ -149,6 +150,7 @@ export const Sidebar = ({
                                             onClick={() => {
                                                 setSidebarOpen(false);
                                             }}
+                                            preload={false}
                                         >
                                             <Button type="button">
                                                 Add S3 account
@@ -170,6 +172,7 @@ export const Sidebar = ({
                                         onClick={() => {
                                             setSidebarOpen(false);
                                         }}
+                                        preload={false}
                                     >
                                         <Button
                                             className="w-full"

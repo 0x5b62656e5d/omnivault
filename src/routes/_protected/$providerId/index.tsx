@@ -86,7 +86,7 @@ function RouteComponent() {
 
             setProviderName(json.data);
         })();
-    });
+    }, [providerId]);
 
     const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-buckets", providerId],
@@ -198,6 +198,7 @@ function RouteComponent() {
                                     bucketId: bucket.id,
                                 }}
                                 key={bucket.id}
+                                preload={false}
                             >
                                 <button
                                     type="button"
