@@ -9,6 +9,7 @@ import { FiArrowUpRight, FiFolder, FiUpload } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { RiArrowUpDownFill } from "react-icons/ri";
 import { DeleteButton } from "@/components/deleteButton";
+import { MoveBucketForm } from "@/components/forms/moveBucketForm";
 import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { stripExtension } from "@/lib/fileExtension";
@@ -354,43 +355,6 @@ function RouteComponent() {
         },
     });
 
-    const moveBucketForm = useForm({
-        defaultValues: {
-            destBucketId: "",
-        },
-        onSubmit: async ({ value }) => {
-            setShowMoveBucketForm(false);
-            setErrormsg(null);
-
-            const res = await fetch("/api/s3/files/move", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    providerId,
-                    destBucketId: value.destBucketId,
-                    srcBucketName: bucketList?.find(
-                        bucket => bucket.id === bucketId,
-                    )?.name,
-                    fileName: oldFilename,
-                }),
-            });
-
-            moveBucketForm.reset();
-
-            if (!res.ok) {
-                console.error("S3 file mgmt error 101");
-                setErrormsg("Failed to move S3 file - Err 101");
-                return;
-            }
-
-            queryClient.invalidateQueries({
-                queryKey: ["s3-files", providerId, bucketId],
-            });
-        },
-    });
-
     const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-files", providerId, bucketId],
         queryFn: async () => {
@@ -690,12 +654,6 @@ function RouteComponent() {
     const handleMoveFile = (filename: string) => {
         setOldFilename(filename);
         setShowMoveBucketForm(true);
-    };
-
-    const handleCloseMoveBucketForm = () => {
-        setOldFilename("");
-        setShowMoveBucketForm(false);
-        renameForm.reset();
     };
 
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -1081,126 +1039,20 @@ function RouteComponent() {
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
-            <AnimatePresence>
                 {showMoveBucketForm && (
-                    <motion.div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        <motion.div
-                            className="relative w-full max-w-lg rounded-xl border bg-background p-6 shadow-2xl"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <button
-                                type="button"
-                                onClick={handleCloseMoveBucketForm}
-                                className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-muted"
-                                aria-label="Close rename file form"
-                            >
-                                <IoClose className="h-6 w-6" />
-                            </button>
-
-                            <div className="mb-6">
-                                <h2 className="text-xl font-semibold">
-                                    Move {oldFilename || "File"}
-                                </h2>
-                            </div>
-
-                            <form
-                                className="flex flex-col gap-4"
-                                onSubmit={event => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    void moveBucketForm.handleSubmit();
-                                }}
-                            >
-                                <moveBucketForm.Field
-                                    name="destBucketId"
-                                    validators={{
-                                        onChange: ({ value }) => {
-                                            if (!value) {
-                                                return "Please select a destination bucket";
-                                            }
-
-                                            return undefined;
-                                        },
-                                    }}
-                                >
-                                    {field => (
-                                        <label className="flex flex-col gap-1">
-                                            <span className="text-sm font-medium">
-                                                Destination bucket
-                                            </span>
-                                            <select
-                                                value={field.state.value}
-                                                onBlur={field.handleBlur}
-                                                onChange={event => {
-                                                    field.handleChange(
-                                                        event.target.value,
-                                                    );
-                                                }}
-                                                className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
-                                            >
-                                                <option value="">
-                                                    Select a bucket
-                                                </option>
-                                                {bucketList
-                                                    ?.filter(
-                                                        bucket =>
-                                                            bucket.id !==
-                                                            bucketId,
-                                                    )
-                                                    .map(bucket => (
-                                                        <option
-                                                            key={bucket.id}
-                                                            value={bucket.id}
-                                                        >
-                                                            {bucket.name}
-                                                        </option>
-                                                    ))}
-                                            </select>
-                                            {field.state.meta.errors.length >
-                                                0 && (
-                                                <span className="text-sm text-destructive">
-                                                    {field.state.meta.errors.join(
-                                                        ", ",
-                                                    )}
-                                                </span>
-                                            )}
-                                        </label>
-                                    )}
-                                </moveBucketForm.Field>
-
-                                <div className="mt-2 flex justify-end gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={handleCloseMoveBucketForm}
-                                        disabled={
-                                            isDeletingFile ||
-                                            isLoading ||
-                                            isRefetching ||
-                                            isUploading
-                                        }
-                                        className={`${isUploading ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit">Move file</Button>
-                                </div>
-                            </form>
-                        </motion.div>
-                    </motion.div>
+                    <MoveBucketForm
+                        setShowMoveBucketForm={setShowMoveBucketForm}
+                        setErrormsg={setErrormsg}
+                        providerId={providerId}
+                        bucketId={bucketId}
+                        bucketList={bucketList}
+                        oldFilename={oldFilename}
+                        setOldFilename={setOldFilename}
+                        queryClient={queryClient}
+                        disabled={isDeletingFile || isLoading || isRefetching}
+                        isUploading={isUploading}
+                    />
                 )}
-            </AnimatePresence>
-            <AnimatePresence>
                 {showUploadFileForm && (
                     <motion.div
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
