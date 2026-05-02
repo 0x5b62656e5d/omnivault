@@ -236,7 +236,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                                     transition={{
                                                         duration: 0.15,
                                                     }}
-                                                    className="absolute flex flex-col gap-1 right-0 top-full mt-2"
+                                                    className="absolute flex flex-col gap-1 right-0 top-full mt-2 z-30"
                                                 >
                                                     <Button
                                                         type="button"
@@ -254,6 +254,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                                     <Button
                                                         type="button"
                                                         onClick={handleSignout}
+                                                        variant="destructive"
                                                     >
                                                         Sign out
                                                     </Button>
@@ -280,7 +281,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             Menu
                         </Button>
                         <main className="flex flex-1 min-h-0">
-                            <Sidebar user={user} ref={sidebarRef} />
+                            <Sidebar
+                                user={user}
+                                invalidateRouter={() => router.invalidate()}
+                                ref={sidebarRef}
+                            />
                             {children}
                         </main>
                     </div>
