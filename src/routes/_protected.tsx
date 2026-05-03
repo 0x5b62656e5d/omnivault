@@ -3,9 +3,7 @@ import { getSession } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/_protected")({
     beforeLoad: async ({ location }) => {
-        const start = performance.now();
         const session = await getSession();
-        console.log("protectedsession", performance.now() - start);
 
         if (!session) {
             throw redirect({
