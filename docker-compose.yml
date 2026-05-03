@@ -10,6 +10,8 @@ services:
       - db_data:/var/lib/postgresql/data
 
   frontend:
+    depends_on:
+      - database
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,3 +50,6 @@ services:
         - ENVIRONMENT=${ENVIRONMENT}
     ports:
       - "${PORT}:${PORT}"
+
+volumes:
+  db_data:
