@@ -65,7 +65,9 @@ function RouteComponent() {
         queryKey: ["s3-accounts"],
         queryFn: async () => {
             setErrormsg(null);
+            const start = performance.now();
             const res = await fetch("/api/s3/accounts");
+            console.log("/api/s3/accounts", performance.now() - start);
 
             if (!res.ok) {
                 setErrormsg("S3 account mgmt error 102");

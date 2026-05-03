@@ -82,7 +82,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ],
     }),
     loader: async () => {
+        const start = performance.now();
         const session = await getSession();
+        console.log("rootsession", performance.now() - start);
 
         return { user: session ? session.user : null };
     },
