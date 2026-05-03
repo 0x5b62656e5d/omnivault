@@ -1,4 +1,14 @@
 services:
+  database:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: omnivault
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
   frontend:
     build:
       context: .
