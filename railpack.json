@@ -2,8 +2,7 @@
     "$schema": "https://schema.railpack.com",
     "provider": "node",
     "packages": {
-        "node": "24",
-        "pnpm": "latest"
+        "node": "22"
     },
     "steps": {
         "install": {
