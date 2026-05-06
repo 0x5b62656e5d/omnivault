@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.railpack.com",
+    "provider": "node",
+    "packages": {
+        "node": "24",
+        "pnpm": "latest"
+    },
+    "steps": {
+        "install": {
+            "inputs": ["."],
+            "commands": ["pnpm install"]
+        },
+        "build": {
+            "inputs": [{ "step": "install" }],
+            "commands": ["pnpm run build"],
+            "secrets": [
+                "DATABASE_URL",
+                "ENCRYPTION_KEY",
+                "HMAC_KEY",
+                "ENCRYPTION_METHOD",
+                "IV_LENGTH",
+                "KDF_SALT",
+                "BASE_URL",
+                "DISCORD_CLIENT_ID",
+                "DISCORD_CLIENT_SECRET",
+                "GITHUB_CLIENT_ID",
+                "GITHUB_CLIENT_SECRET",
+                "RAILWAY_CLIENT_ID",
+                "RAILWAY_CLIENT_SECRET",
+                "BETTER_AUTH_SECRET",
+                "ENVIRONMENT"
+            ],
+            "deployOutputs": [
+                {
+                    "include": [".output"]
+                }
+            ]
+        }
+    },
+    "deploy": {
+        "startCommand": "node .output/server/index.mjs"
+    }
+}
