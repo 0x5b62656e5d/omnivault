@@ -6,8 +6,14 @@
     },
     "steps": {
         "install": {
-            "commands": ["pnpm install"],
-            "inputs": ["."]
+            "commands": [
+                { "src": "package.json", "dest": "package.json" },
+                { "src": "pnpm-lock.yaml", "dest": "pnpm-lock.yaml" },
+                {
+                    "cmd": "pnpm ci",
+                    "customName": "Install dependencies"
+                }
+            ]
         },
         "build": {
             "inputs": [{ "step": "install" }],
