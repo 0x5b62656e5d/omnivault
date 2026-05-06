@@ -6,7 +6,8 @@
     },
     "steps": {
         "install": {
-            "commands": ["pnpm install"]
+            "commands": ["pnpm install"],
+            "inputs": ["."]
         },
         "build": {
             "inputs": [{ "step": "install" }],
