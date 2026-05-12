@@ -2,7 +2,8 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY pnpm-lock.yaml ./
 
 ARG DATABASE_URL
 ARG ENCRYPTION_KEY
