@@ -37,7 +37,7 @@ ENV RAILWAY_CLIENT_SECRET={RAILWAY_CLIENT_SECRET}
 ENV BETTER_AUTH_SECRET={BETTER_AUTH_SECRET}
 ENV ENVIRONMENT={ENVIRONMENT}
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10
 RUN pnpm install --frozen-lockfile
 
 COPY . .
