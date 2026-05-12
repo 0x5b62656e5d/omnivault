@@ -37,7 +37,7 @@ ENV BETTER_AUTH_SECRET={BETTER_AUTH_SECRET}
 ENV ENVIRONMENT={ENVIRONMENT}
 
 RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
