@@ -37,7 +37,7 @@ ENV RAILWAY_CLIENT_SECRET={RAILWAY_CLIENT_SECRET}
 ENV BETTER_AUTH_SECRET={BETTER_AUTH_SECRET}
 ENV ENVIRONMENT={ENVIRONMENT}
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 RUN pnpm install --frozen-lockfile
 
 COPY . .
@@ -48,7 +48,7 @@ RUN pnpm run build
 
 # WORKDIR /app
 
-# RUN npm install -g pnpm
+# RUN npm install -g pnpm@9
 
 # COPY --from=builder /app/package.json ./package.json
 # COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
