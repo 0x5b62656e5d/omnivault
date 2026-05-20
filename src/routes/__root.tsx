@@ -157,14 +157,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     }}
                 >
                     <div className="flex min-h-screen flex-col">
-                        <div className="flex items-center justify-center gap-2 py-2 px-4 text-center bg-orange-400/50">
-                            <IoIosWarning />
-                            <p>
-                                Omnivault is still in development. Account data
-                                may be deleted at any time.
-                            </p>
-                            <IoIosWarning />
-                        </div>
                         <header className="hidden lg:flex justify-between items-center py-4 px-6 border-b-2">
                             <div className="flex gap-1">
                                 <nav className="flex gap-4 items-center">
