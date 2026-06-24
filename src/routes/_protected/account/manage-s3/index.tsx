@@ -26,6 +26,7 @@ function RouteComponent() {
     const [errorMsg, setErrormsg] = useState<string | null>(null);
     const [isManualRefetching, setIsManualRefetching] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
 
     const form = useForm({
         defaultValues: {
@@ -38,6 +39,7 @@ function RouteComponent() {
         onSubmit: async ({ value }) => {
             setShowAddAccountForm(false);
             setErrormsg(null);
+            setIsAdding(true);
 
             const res = await fetch("/api/s3/accounts", {
                 method: "POST",
@@ -52,12 +54,14 @@ function RouteComponent() {
             if (!res.ok) {
                 console.error("S3 account mgmt error 101");
                 setErrormsg("Failed to add S3 account - Err 101");
+                setIsAdding(false);
                 return;
             }
 
             queryClient.invalidateQueries({
                 queryKey: ["s3-accounts"],
             });
+            setIsAdding(false);
         },
     });
 
@@ -154,7 +158,7 @@ function RouteComponent() {
                 Manage S3 accounts
             </h1>
             <div className="flex flex-col justify-center items-center gap-2">
-                {(isLoading || isRefetching) && <Loader />}
+                {(isLoading || isRefetching || isAdding) && <Loader />}
                 {data?.map(account => (
                     <div
                         key={account.id}
@@ -186,11 +190,16 @@ function RouteComponent() {
                         {errorMsg || "Error fetching S3 accounts"}
                     </p>
                 )}
-                <Button onClick={handleAddAccount}>Add S3 Account</Button>
+                <Button
+                    onClick={handleAddAccount}
+                    disabled={isLoading || isRefetching || isAdding}
+                >
+                    Add S3 Account
+                </Button>
                 {data && (
                     <Button
                         onClick={handleRefetchBuckets}
-                        disabled={isManualRefetching}
+                        disabled={isManualRefetching || isAdding}
                         className={`${isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
                     >
                         {isManualRefetching
