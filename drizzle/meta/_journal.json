@@ -50,6 +50,13 @@
       "when": 1777372939931,
       "tag": "0006_volatile_stone_men",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782532280524,
+      "tag": "0007_many_captain_america",
+      "breakpoints": true
     }
   ]
 }

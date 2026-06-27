@@ -44,6 +44,7 @@ export const s3buckets = pgTable(
             .$defaultFn(() => createId()),
         name: text().notNull(),
         region: text().notNull(),
+        customUrl: text("custom_url"),
         parentCredential: text("parent_credential")
             .notNull()
             .references(() => s3credentials.id, { onDelete: "cascade" }),
