@@ -129,10 +129,11 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     );
                 }
 
-                await db.update(s3buckets)
+                await db
+                    .update(s3buckets)
                     .set({ customUrl: bucketUrl === "" ? null : bucketUrl })
                     .where(eq(s3buckets.id, bucketId));
-                
+
                 return new Response(null, {
                     headers: {
                         "Content-Type": "application/json",

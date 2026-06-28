@@ -126,7 +126,9 @@ function RouteComponent() {
 
         (async () => {
             setErrormsg(null);
-            const res = await fetch(`/api/s3/buckets/customUrl?providerId=${providerId}&bucketId=${bucketId}`);
+            const res = await fetch(
+                `/api/s3/buckets/customUrl?providerId=${providerId}&bucketId=${bucketId}`,
+            );
 
             if (!res.ok) {
                 setErrormsg("S3 bucket mgmt error 103");
@@ -252,6 +254,14 @@ function RouteComponent() {
                         size: 0,
                         isEmpty: folderChildren.length === 0,
                     });
+
+                    entries.push({
+                        type: "folder",
+                        name: folderName,
+                        key: folderKey,
+                        size: 0,
+                        isEmpty: folderChildren.length === 0,
+                    });
                 }
 
                 return entries;
@@ -307,7 +317,6 @@ function RouteComponent() {
         }
 
         if (customBucketUrl) {
-            
             const a = document.createElement("a");
             a.href = `${customBucketUrl}/${fileKey}`;
             a.download = fileKey;
@@ -402,7 +411,11 @@ function RouteComponent() {
         }
 
         if (customBucketUrl) {
-            window.open(`${customBucketUrl}/${fileKey}`, "_blank", "noopener,noreferrer");
+            window.open(
+                `${customBucketUrl}/${fileKey}`,
+                "_blank",
+                "noopener,noreferrer",
+            );
             return;
         }
 

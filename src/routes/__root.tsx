@@ -10,7 +10,6 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { IoIosWarning } from "react-icons/io";
 import { NotFound } from "@/components/notFound";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";

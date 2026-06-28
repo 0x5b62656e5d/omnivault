@@ -94,8 +94,8 @@ function RouteComponent() {
                 );
                 return;
             }
-        }
-    })
+        },
+    });
 
     useEffect(() => {
         (async () => {
@@ -212,18 +212,25 @@ function RouteComponent() {
         });
     };
 
-    const handleEditBucketForm = (bucketId: string, bucketName: string, bucketUrl: string | null) => {
+    const handleEditBucketForm = (
+        bucketId: string,
+        bucketName: string,
+        bucketUrl: string | null,
+    ) => {
         setShowEditBucketForm(true);
         setEditBucketName(bucketName);
         setEditBucketId(bucketId);
-        editBucketForm.setFieldValue("bucketUrl", bucketUrl === null ? "" : bucketUrl);
-    }
+        editBucketForm.setFieldValue(
+            "bucketUrl",
+            bucketUrl === null ? "" : bucketUrl,
+        );
+    };
 
     const handleCloseEditBucketForm = () => {
         setShowEditBucketForm(false);
         setEditBucketName(null);
         editBucketForm.reset();
-    }
+    };
 
     return (
         <div className="flex flex-col">
@@ -268,7 +275,13 @@ function RouteComponent() {
                             </Link>
                             <div className="flex flex-col gap-2">
                                 <Button
-                                    onClick={() => handleEditBucketForm(bucket.id, bucket.name, bucket.customUrl)}
+                                    onClick={() =>
+                                        handleEditBucketForm(
+                                            bucket.id,
+                                            bucket.name,
+                                            bucket.customUrl,
+                                        )
+                                    }
                                     disabled={
                                         isLoading ||
                                         isRefetching ||
@@ -365,7 +378,11 @@ function RouteComponent() {
                                                 return undefined;
                                             }
 
-                                            if (!/^https:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?& \/=]*)$/.test(value)) {
+                                            if (
+                                                !/^https:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?& /=]*)$/.test(
+                                                    value,
+                                                )
+                                            ) {
                                                 return "Value must be a secure URL";
                                             }
 

@@ -1,16 +1,16 @@
-import { s3buckets } from '@/db/schema';
-import { getSession } from '@/lib/auth.functions';
-import { createStandardResponse } from '@/lib/utils';
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
-import { db } from '@/db';
+import { db } from "@/db";
+import { s3buckets } from "@/db/schema";
+import { getSession } from "@/lib/auth.functions";
+import { createStandardResponse } from "@/lib/utils";
 
 export const Route = createFileRoute("/api/s3/buckets/customUrl/")({
     server: {
         handlers: {
             GET: async ({ request }) => {
                 const session = await getSession();
-                
+
                 if (!session) {
                     return new Response(
                         JSON.stringify(
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/api/s3/buckets/customUrl/")({
                 const url = new URL(request.url);
                 const providerId = url.searchParams.get("providerId");
                 const bucketId = url.searchParams.get("bucketId");
-                
+
                 if (!providerId || !bucketId) {
                     return new Response(
                         JSON.stringify(
@@ -82,14 +82,14 @@ export const Route = createFileRoute("/api/s3/buckets/customUrl/")({
                         },
                     );
                 }
-                
+
                 return new Response(
                     JSON.stringify(
                         createStandardResponse(
                             true,
                             res[0].customUrl,
                             null,
-                            null
+                            null,
                         ),
                     ),
                     {
@@ -99,7 +99,7 @@ export const Route = createFileRoute("/api/s3/buckets/customUrl/")({
                         status: 200,
                     },
                 );
-            }
-        }
-    }
+            },
+        },
+    },
 });
