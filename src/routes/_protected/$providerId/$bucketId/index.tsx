@@ -56,6 +56,7 @@ function RouteComponent() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPrefix, setCurrentPrefix] = useState("");
     const [openFileMenuKey, setOpenFileMenuKey] = useState<string | null>(null);
+    const [customBucketUrl, setCustomBucketUrl] = useState<string | null>(null);
     const [filterBy, setFilterBy] = useState<"name" | "size">("name");
     const [filterOrder, setFilterOrder] = useState<"asc" | "desc">("asc");
     const [debouncedSearchQuery, _searchQueryDebouncer] = useDebouncedValue(
@@ -122,7 +123,26 @@ function RouteComponent() {
 
             setBucketList(json.data);
         })();
-    }, [providerId, queryClient.getQueryData]);
+
+        (async () => {
+            setErrormsg(null);
+            const res = await fetch(`/api/s3/buckets/customUrl?providerId=${providerId}&bucketId=${bucketId}`);
+
+            if (!res.ok) {
+                setErrormsg("S3 bucket mgmt error 103");
+                return;
+            }
+
+            const json = await res.json();
+
+            if (!json.success) {
+                setErrormsg("S3 bucket mgmt error 104");
+                return;
+            }
+
+            setCustomBucketUrl(json.data);
+        })();
+    }, [bucketId, providerId, queryClient.getQueryData]);
 
     const { data, isLoading, isRefetching } = useQuery({
         queryKey: ["s3-files", providerId, bucketId],
@@ -286,6 +306,17 @@ function RouteComponent() {
             return;
         }
 
+        if (customBucketUrl) {
+            
+            const a = document.createElement("a");
+            a.href = `${customBucketUrl}/${fileKey}`;
+            a.download = fileKey;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            return;
+        }
+
         const res = await fetch(
             `/api/s3/files/download?providerId=${providerId}&bucketId=${bucketId}&fileIdentifier=${fileKey}`,
         );
@@ -367,6 +398,11 @@ function RouteComponent() {
         setErrormsg(null);
         if (!fileKey) {
             setErrormsg("Invalid file key");
+            return;
+        }
+
+        if (customBucketUrl) {
+            window.open(`${customBucketUrl}/${fileKey}`, "_blank", "noopener,noreferrer");
             return;
         }
 

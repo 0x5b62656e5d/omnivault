@@ -26,6 +26,9 @@ function RouteComponent() {
         string | null
     >(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showEditBucketForm, setShowEditBucketForm] = useState(false);
+    const [editBucketName, setEditBucketName] = useState<string | null>(null);
+    const [editBucketId, setEditBucketId] = useState<string | null>(null);
 
     const form = useForm({
         defaultValues: {
@@ -63,6 +66,36 @@ function RouteComponent() {
             });
         },
     });
+
+    const editBucketForm = useForm({
+        defaultValues: {
+            bucketUrl: "",
+        },
+        onSubmit: async ({ value }) => {
+            setShowEditBucketForm(false);
+            setErrormsg(null);
+
+            const res = await fetch("/api/s3/buckets", {
+                method: "PATCH",
+                body: JSON.stringify({ ...value, bucketId: editBucketId }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            editBucketForm.reset();
+
+            if (!res.ok) {
+                const json = await res.json();
+
+                console.error(json.message || "S3 bucket mgmt error 105");
+                setErrormsg(
+                    json.message || "Failed to edit bucket URL - Err 105",
+                );
+                return;
+            }
+        }
+    })
 
     useEffect(() => {
         (async () => {
@@ -179,6 +212,19 @@ function RouteComponent() {
         });
     };
 
+    const handleEditBucketForm = (bucketId: string, bucketName: string, bucketUrl: string | null) => {
+        setShowEditBucketForm(true);
+        setEditBucketName(bucketName);
+        setEditBucketId(bucketId);
+        editBucketForm.setFieldValue("bucketUrl", bucketUrl === null ? "" : bucketUrl);
+    }
+
+    const handleCloseEditBucketForm = () => {
+        setShowEditBucketForm(false);
+        setEditBucketName(null);
+        editBucketForm.reset();
+    }
+
     return (
         <div className="flex flex-col">
             <div className="flex flex-col w-[90%] lg:w-xl self-center gap-4">
@@ -220,17 +266,32 @@ function RouteComponent() {
                                     </p>
                                 </button>
                             </Link>
-                            <DeleteButton
-                                onClick={() => handleDeleteBucket(bucket.id)}
-                                deleteConfirmationId={deleteConfirmationId}
-                                idMatcher={bucket.id}
-                                disabled={
-                                    isLoading ||
-                                    isRefetching ||
-                                    isManualRefetching ||
-                                    isDeleting
-                                }
-                            />
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    onClick={() => handleEditBucketForm(bucket.id, bucket.name, bucket.customUrl)}
+                                    disabled={
+                                        isLoading ||
+                                        isRefetching ||
+                                        isManualRefetching
+                                    }
+                                    className={`${isLoading || isRefetching || isManualRefetching ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                >
+                                    Edit URL
+                                </Button>
+                                <DeleteButton
+                                    onClick={() =>
+                                        handleDeleteBucket(bucket.id)
+                                    }
+                                    deleteConfirmationId={deleteConfirmationId}
+                                    idMatcher={bucket.id}
+                                    disabled={
+                                        isLoading ||
+                                        isRefetching ||
+                                        isManualRefetching ||
+                                        isDeleting
+                                    }
+                                />
+                            </div>
                         </div>
                     ))}
                     {data?.length === 0 && <p>No S3 buckets added yet.</p>}
@@ -257,6 +318,105 @@ function RouteComponent() {
                         : "Refetch S3 buckets"}
                 </Button>
             </div>
+            <AnimatePresence>
+                {showEditBucketForm && (
+                    <motion.div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <motion.div
+                            className="relative w-full max-w-lg rounded-xl border bg-background p-6 shadow-2xl"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <button
+                                type="button"
+                                onClick={handleCloseEditBucketForm}
+                                className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-muted"
+                                aria-label="Close edit S3 bucket edit form"
+                            >
+                                <IoClose className="h-6 w-6" />
+                            </button>
+
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold">
+                                    Edit bucket custom URL for {editBucketName}
+                                </h2>
+                            </div>
+
+                            <form
+                                className="flex flex-col gap-4"
+                                onSubmit={event => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    void editBucketForm.handleSubmit();
+                                }}
+                            >
+                                <editBucketForm.Field
+                                    name="bucketUrl"
+                                    validators={{
+                                        onChange: ({ value }) => {
+                                            if (!value.trim()) {
+                                                return undefined;
+                                            }
+
+                                            if (!/^https:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?& \/=]*)$/.test(value)) {
+                                                return "Value must be a secure URL";
+                                            }
+
+                                            return undefined;
+                                        },
+                                    }}
+                                >
+                                    {field => (
+                                        <label className="flex flex-col gap-1">
+                                            <span className="text-sm font-medium">
+                                                Bucket URL
+                                            </span>
+                                            <input
+                                                value={field.state.value}
+                                                onBlur={field.handleBlur}
+                                                onChange={event => {
+                                                    field.handleChange(
+                                                        event.target.value,
+                                                    );
+                                                }}
+                                                placeholder="https://example.com"
+                                                type="url"
+                                                className="rounded-md border bg-background px-3 py-2 outline-none transition focus:ring-2 focus:ring-ring"
+                                            />
+                                            {field.state.meta.errors.length >
+                                                0 && (
+                                                <span className="text-sm text-destructive">
+                                                    {field.state.meta.errors.join(
+                                                        ", ",
+                                                    )}
+                                                </span>
+                                            )}
+                                        </label>
+                                    )}
+                                </editBucketForm.Field>
+
+                                <div className="mt-2 flex justify-end gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={handleCloseEditBucketForm}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">Save</Button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <AnimatePresence>
                 {showAddBucketForm && (
                     <motion.div

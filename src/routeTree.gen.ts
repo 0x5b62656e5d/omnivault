@@ -27,6 +27,7 @@ import { Route as ApiS3FilesPreviewIndexRouteImport } from './routes/api/s3/file
 import { Route as ApiS3FilesMoveIndexRouteImport } from './routes/api/s3/files/move/index'
 import { Route as ApiS3FilesDownloadIndexRouteImport } from './routes/api/s3/files/download/index'
 import { Route as ApiS3BucketsRefetchIndexRouteImport } from './routes/api/s3/buckets/refetch/index'
+import { Route as ApiS3BucketsCustomUrlIndexRouteImport } from './routes/api/s3/buckets/customUrl/index'
 import { Route as ApiS3FilesMultipartCompleteIndexRouteImport } from './routes/api/s3/files/multipart/complete/index'
 import { Route as ApiS3FilesMultipartAbortIndexRouteImport } from './routes/api/s3/files/multipart/abort/index'
 import { Route as ApiS3BucketsRefetchProviderIdIndexRouteImport } from './routes/api/s3/buckets/refetch/$providerId/index'
@@ -124,6 +125,12 @@ const ApiS3BucketsRefetchIndexRoute =
     path: '/api/s3/buckets/refetch/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiS3BucketsCustomUrlIndexRoute =
+  ApiS3BucketsCustomUrlIndexRouteImport.update({
+    id: '/api/s3/buckets/customUrl/',
+    path: '/api/s3/buckets/customUrl/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiS3FilesMultipartCompleteIndexRoute =
   ApiS3FilesMultipartCompleteIndexRouteImport.update({
     id: '/api/s3/files/multipart/complete/',
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/api/s3/buckets/': typeof ApiS3BucketsIndexRoute
   '/api/s3/credential/': typeof ApiS3CredentialIndexRoute
   '/api/s3/files/': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/customUrl/': typeof ApiS3BucketsCustomUrlIndexRoute
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move/': typeof ApiS3FilesMoveIndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/api/s3/buckets': typeof ApiS3BucketsIndexRoute
   '/api/s3/credential': typeof ApiS3CredentialIndexRoute
   '/api/s3/files': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/customUrl': typeof ApiS3BucketsCustomUrlIndexRoute
   '/api/s3/buckets/refetch': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move': typeof ApiS3FilesMoveIndexRoute
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/api/s3/buckets/': typeof ApiS3BucketsIndexRoute
   '/api/s3/credential/': typeof ApiS3CredentialIndexRoute
   '/api/s3/files/': typeof ApiS3FilesIndexRoute
+  '/api/s3/buckets/customUrl/': typeof ApiS3BucketsCustomUrlIndexRoute
   '/api/s3/buckets/refetch/': typeof ApiS3BucketsRefetchIndexRoute
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move/': typeof ApiS3FilesMoveIndexRoute
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/api/s3/buckets/'
     | '/api/s3/credential/'
     | '/api/s3/files/'
+    | '/api/s3/buckets/customUrl/'
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
     | '/api/s3/files/move/'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/api/s3/buckets'
     | '/api/s3/credential'
     | '/api/s3/files'
+    | '/api/s3/buckets/customUrl'
     | '/api/s3/buckets/refetch'
     | '/api/s3/files/download'
     | '/api/s3/files/move'
@@ -272,6 +284,7 @@ export interface FileRouteTypes {
     | '/api/s3/buckets/'
     | '/api/s3/credential/'
     | '/api/s3/files/'
+    | '/api/s3/buckets/customUrl/'
     | '/api/s3/buckets/refetch/'
     | '/api/s3/files/download/'
     | '/api/s3/files/move/'
@@ -291,6 +304,7 @@ export interface RootRouteChildren {
   ApiS3BucketsIndexRoute: typeof ApiS3BucketsIndexRoute
   ApiS3CredentialIndexRoute: typeof ApiS3CredentialIndexRoute
   ApiS3FilesIndexRoute: typeof ApiS3FilesIndexRoute
+  ApiS3BucketsCustomUrlIndexRoute: typeof ApiS3BucketsCustomUrlIndexRoute
   ApiS3BucketsRefetchIndexRoute: typeof ApiS3BucketsRefetchIndexRoute
   ApiS3FilesDownloadIndexRoute: typeof ApiS3FilesDownloadIndexRoute
   ApiS3FilesMoveIndexRoute: typeof ApiS3FilesMoveIndexRoute
@@ -428,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiS3BucketsRefetchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/s3/buckets/customUrl/': {
+      id: '/api/s3/buckets/customUrl/'
+      path: '/api/s3/buckets/customUrl'
+      fullPath: '/api/s3/buckets/customUrl/'
+      preLoaderRoute: typeof ApiS3BucketsCustomUrlIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/s3/files/multipart/complete/': {
       id: '/api/s3/files/multipart/complete/'
       path: '/api/s3/files/multipart/complete'
@@ -482,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiS3BucketsIndexRoute: ApiS3BucketsIndexRoute,
   ApiS3CredentialIndexRoute: ApiS3CredentialIndexRoute,
   ApiS3FilesIndexRoute: ApiS3FilesIndexRoute,
+  ApiS3BucketsCustomUrlIndexRoute: ApiS3BucketsCustomUrlIndexRoute,
   ApiS3BucketsRefetchIndexRoute: ApiS3BucketsRefetchIndexRoute,
   ApiS3FilesDownloadIndexRoute: ApiS3FilesDownloadIndexRoute,
   ApiS3FilesMoveIndexRoute: ApiS3FilesMoveIndexRoute,

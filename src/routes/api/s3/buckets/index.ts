@@ -85,6 +85,61 @@ export const Route = createFileRoute("/api/s3/buckets/")({
                     },
                 );
             },
+            PATCH: async ({ request }) => {
+                const session = await getSession();
+
+                if (!session) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Unauthorized",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 401,
+                        },
+                    );
+                }
+
+                const body = await request.json();
+                const { bucketId, bucketUrl } = body;
+
+                if (!bucketId) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                false,
+                                null,
+                                "Missing required fields: bucketId",
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 400,
+                        },
+                    );
+                }
+
+                await db.update(s3buckets)
+                    .set({ customUrl: bucketUrl === "" ? null : bucketUrl })
+                    .where(eq(s3buckets.id, bucketId));
+                
+                return new Response(null, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    status: 204,
+                });
+            },
             POST: async ({ request }) => {
                 const session = await getSession();
 
