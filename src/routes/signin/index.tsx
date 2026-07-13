@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { FaDiscord, FaGithub } from "react-icons/fa";
+import { FaDiscord, FaGithub, FaKey } from "react-icons/fa";
 import { SiRailway } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth.functions";
@@ -46,6 +46,23 @@ function RouteComponent() {
             callbackURL: "/",
         });
     };
+    
+	const signinWithPasskey = async (
+		_event: React.MouseEvent<HTMLButtonElement>,
+	) => {
+		await authClient.signIn.passkey({
+			autoFill: false,
+			extensions: undefined,
+			fetchOptions: {
+				onSuccess() {
+					window.location.href = "/";
+				},
+				onError(context) {
+					console.error("Authentication failed:", context.error.message);
+				},
+			},
+		});
+	};
 
     return (
         <div className="w-full flex flex-col justify-center items-center m-4 p-4 gap-4">
@@ -59,6 +76,9 @@ function RouteComponent() {
             <Button onClick={signinWithRailway} type="button">
                 <SiRailway /> Sign in with Railway
             </Button>
+            <Button onClick={signinWithPasskey} type="button">
+				<FaKey /> Sign in with a passkey
+			</Button>
         </div>
     );
 }
