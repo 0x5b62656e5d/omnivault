@@ -110,7 +110,7 @@ export const Route = createFileRoute("/api/s3/files/download/")({
                         new GetObjectCommand({
                             Bucket: row.bucket.name,
                             Key: fileIdentifier,
-                            ResponseContentDisposition: `attachment; filename="${encodeURIComponent(fileIdentifier)}"`,
+                            ResponseContentDisposition: `attachment; filename="${encodeURIComponent(fileIdentifier.split("/").pop() || fileIdentifier)}"`,
                         }),
                         { expiresIn: 3600 },
                     );
