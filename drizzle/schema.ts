@@ -98,6 +98,7 @@ export const s3Buckets = pgTable("s3buckets", {
 	parentCredential: text("parent_credential").notNull(),
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
 	ownedBy: text("owned_by").notNull(),
+	customUrl: text("custom_url"),
 }, (table) => [
 	uniqueIndex("unique_bucket_per_credential").using("btree", table.name.asc().nullsLast().op("text_ops"), table.parentCredential.asc().nullsLast().op("text_ops")),
 	foreignKey({

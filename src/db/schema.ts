@@ -9,7 +9,12 @@ import {
     timestamp,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { customAlphabet } from "nanoid";
 import { user } from "./auth-schema";
+
+const generateNanoid = customAlphabet(
+    "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+);
 
 export const s3credentials = pgTable(
     "s3credentials",
@@ -81,6 +86,17 @@ export const multipartUploads = pgTable(
     },
     table => [index("upload_id_idx").on(table.uploadId)],
 );
+
+export const fileUrls = pgTable("file_urls", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => generateNanoid(6)),
+    fileKey: text("file_key").notNull(),
+    url: text().notNull(),
+    download: boolean().default(false),
+    createdAt: timestamp("created_at").defaultNow(),
+    expiresAt: timestamp("expires_at").notNull(),
+});
 
 export const s3credentialsToUserRelations = relations(
     s3credentials,
