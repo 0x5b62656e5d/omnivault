@@ -4,11 +4,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { fileUrls, s3buckets, s3credentials } from "@/db/schema";
+import { env } from "@/env/server";
 import { getSession } from "@/lib/auth.functions";
 import { decrypt } from "@/lib/encryption";
 import { createClient } from "@/lib/s3/client";
 import { createStandardResponse } from "@/lib/utils";
-import { env } from "@/env/server";
 
 export const Route = createFileRoute("/api/s3/files/share/")({
     server: {

@@ -12,9 +12,7 @@ import {
 import { customAlphabet } from "nanoid";
 import { user } from "./auth-schema";
 
-const generateNanoid = customAlphabet(
-    "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-);
+const generateNanoid = customAlphabet("1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 export const s3credentials = pgTable(
     "s3credentials",

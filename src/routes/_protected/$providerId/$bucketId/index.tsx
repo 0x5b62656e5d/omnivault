@@ -11,11 +11,11 @@ import { DeleteButton } from "@/components/deleteButton";
 import { useFileRenameForm } from "@/components/forms/fileRenameForm";
 import { useFileUploadForm } from "@/components/forms/fileUploadForm";
 import { MoveBucketForm } from "@/components/forms/moveBucketForm";
+import { useFileShareForm } from "@/components/forms/shareFileForm";
 import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { stripExtension } from "@/lib/fileExtension";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
-import { useFileShareForm } from "@/components/forms/shareFileForm";
 
 type DirectoryEntry =
     | {
