@@ -13,6 +13,8 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as R404IndexRouteImport } from './routes/404/index'
+import { Route as FFileIdIndexRouteImport } from './routes/f/$fileId/index'
 import { Route as ApiHealthIndexRouteImport } from './routes/api/health/index'
 import { Route as ProtectedAccountIndexRouteImport } from './routes/_protected/account/index'
 import { Route as ProtectedProviderIdIndexRouteImport } from './routes/_protected/$providerId/index'
@@ -23,6 +25,7 @@ import { Route as ApiS3BucketsIndexRouteImport } from './routes/api/s3/buckets/i
 import { Route as ApiS3AccountsIndexRouteImport } from './routes/api/s3/accounts/index'
 import { Route as ProtectedAccountManageS3IndexRouteImport } from './routes/_protected/account/manage-s3/index'
 import { Route as ProtectedProviderIdBucketIdIndexRouteImport } from './routes/_protected/$providerId/$bucketId/index'
+import { Route as ApiS3FilesShareIndexRouteImport } from './routes/api/s3/files/share/index'
 import { Route as ApiS3FilesPreviewIndexRouteImport } from './routes/api/s3/files/preview/index'
 import { Route as ApiS3FilesMoveIndexRouteImport } from './routes/api/s3/files/move/index'
 import { Route as ApiS3FilesDownloadIndexRouteImport } from './routes/api/s3/files/download/index'
@@ -50,6 +53,16 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProtectedRoute,
+} as any)
+const R404IndexRoute = R404IndexRouteImport.update({
+  id: '/404/',
+  path: '/404/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FFileIdIndexRoute = FFileIdIndexRouteImport.update({
+  id: '/f/$fileId/',
+  path: '/f/$fileId/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthIndexRoute = ApiHealthIndexRouteImport.update({
   id: '/api/health/',
@@ -104,6 +117,11 @@ const ProtectedProviderIdBucketIdIndexRoute =
     path: '/$providerId/$bucketId/',
     getParentRoute: () => ProtectedRoute,
   } as any)
+const ApiS3FilesShareIndexRoute = ApiS3FilesShareIndexRouteImport.update({
+  id: '/api/s3/files/share/',
+  path: '/api/s3/files/share/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiS3FilesPreviewIndexRoute = ApiS3FilesPreviewIndexRouteImport.update({
   id: '/api/s3/files/preview/',
   path: '/api/s3/files/preview/',
@@ -152,12 +170,14 @@ const ApiS3BucketsRefetchProviderIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
+  '/404/': typeof R404IndexRoute
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$providerId/': typeof ProtectedProviderIdIndexRoute
   '/account/': typeof ProtectedAccountIndexRoute
   '/api/health/': typeof ApiHealthIndexRoute
+  '/f/$fileId/': typeof FFileIdIndexRoute
   '/$providerId/$bucketId/': typeof ProtectedProviderIdBucketIdIndexRoute
   '/account/manage-s3/': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts/': typeof ApiS3AccountsIndexRoute
@@ -169,11 +189,13 @@ export interface FileRoutesByFullPath {
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move/': typeof ApiS3FilesMoveIndexRoute
   '/api/s3/files/preview/': typeof ApiS3FilesPreviewIndexRoute
+  '/api/s3/files/share/': typeof ApiS3FilesShareIndexRoute
   '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
   '/api/s3/files/multipart/abort/': typeof ApiS3FilesMultipartAbortIndexRoute
   '/api/s3/files/multipart/complete/': typeof ApiS3FilesMultipartCompleteIndexRoute
 }
 export interface FileRoutesByTo {
+  '/404': typeof R404IndexRoute
   '/': typeof ProtectedIndexRoute
   '/about': typeof AboutIndexRoute
   '/signin': typeof SigninIndexRoute
@@ -181,6 +203,7 @@ export interface FileRoutesByTo {
   '/$providerId': typeof ProtectedProviderIdIndexRoute
   '/account': typeof ProtectedAccountIndexRoute
   '/api/health': typeof ApiHealthIndexRoute
+  '/f/$fileId': typeof FFileIdIndexRoute
   '/$providerId/$bucketId': typeof ProtectedProviderIdBucketIdIndexRoute
   '/account/manage-s3': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts': typeof ApiS3AccountsIndexRoute
@@ -192,6 +215,7 @@ export interface FileRoutesByTo {
   '/api/s3/files/download': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move': typeof ApiS3FilesMoveIndexRoute
   '/api/s3/files/preview': typeof ApiS3FilesPreviewIndexRoute
+  '/api/s3/files/share': typeof ApiS3FilesShareIndexRoute
   '/api/s3/buckets/refetch/$providerId': typeof ApiS3BucketsRefetchProviderIdIndexRoute
   '/api/s3/files/multipart/abort': typeof ApiS3FilesMultipartAbortIndexRoute
   '/api/s3/files/multipart/complete': typeof ApiS3FilesMultipartCompleteIndexRoute
@@ -199,6 +223,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteWithChildren
+  '/404/': typeof R404IndexRoute
   '/_protected/': typeof ProtectedIndexRoute
   '/about/': typeof AboutIndexRoute
   '/signin/': typeof SigninIndexRoute
@@ -206,6 +231,7 @@ export interface FileRoutesById {
   '/_protected/$providerId/': typeof ProtectedProviderIdIndexRoute
   '/_protected/account/': typeof ProtectedAccountIndexRoute
   '/api/health/': typeof ApiHealthIndexRoute
+  '/f/$fileId/': typeof FFileIdIndexRoute
   '/_protected/$providerId/$bucketId/': typeof ProtectedProviderIdBucketIdIndexRoute
   '/_protected/account/manage-s3/': typeof ProtectedAccountManageS3IndexRoute
   '/api/s3/accounts/': typeof ApiS3AccountsIndexRoute
@@ -217,6 +243,7 @@ export interface FileRoutesById {
   '/api/s3/files/download/': typeof ApiS3FilesDownloadIndexRoute
   '/api/s3/files/move/': typeof ApiS3FilesMoveIndexRoute
   '/api/s3/files/preview/': typeof ApiS3FilesPreviewIndexRoute
+  '/api/s3/files/share/': typeof ApiS3FilesShareIndexRoute
   '/api/s3/buckets/refetch/$providerId/': typeof ApiS3BucketsRefetchProviderIdIndexRoute
   '/api/s3/files/multipart/abort/': typeof ApiS3FilesMultipartAbortIndexRoute
   '/api/s3/files/multipart/complete/': typeof ApiS3FilesMultipartCompleteIndexRoute
@@ -225,12 +252,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/404/'
     | '/about/'
     | '/signin/'
     | '/api/auth/$'
     | '/$providerId/'
     | '/account/'
     | '/api/health/'
+    | '/f/$fileId/'
     | '/$providerId/$bucketId/'
     | '/account/manage-s3/'
     | '/api/s3/accounts/'
@@ -242,11 +271,13 @@ export interface FileRouteTypes {
     | '/api/s3/files/download/'
     | '/api/s3/files/move/'
     | '/api/s3/files/preview/'
+    | '/api/s3/files/share/'
     | '/api/s3/buckets/refetch/$providerId/'
     | '/api/s3/files/multipart/abort/'
     | '/api/s3/files/multipart/complete/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/404'
     | '/'
     | '/about'
     | '/signin'
@@ -254,6 +285,7 @@ export interface FileRouteTypes {
     | '/$providerId'
     | '/account'
     | '/api/health'
+    | '/f/$fileId'
     | '/$providerId/$bucketId'
     | '/account/manage-s3'
     | '/api/s3/accounts'
@@ -265,12 +297,14 @@ export interface FileRouteTypes {
     | '/api/s3/files/download'
     | '/api/s3/files/move'
     | '/api/s3/files/preview'
+    | '/api/s3/files/share'
     | '/api/s3/buckets/refetch/$providerId'
     | '/api/s3/files/multipart/abort'
     | '/api/s3/files/multipart/complete'
   id:
     | '__root__'
     | '/_protected'
+    | '/404/'
     | '/_protected/'
     | '/about/'
     | '/signin/'
@@ -278,6 +312,7 @@ export interface FileRouteTypes {
     | '/_protected/$providerId/'
     | '/_protected/account/'
     | '/api/health/'
+    | '/f/$fileId/'
     | '/_protected/$providerId/$bucketId/'
     | '/_protected/account/manage-s3/'
     | '/api/s3/accounts/'
@@ -289,6 +324,7 @@ export interface FileRouteTypes {
     | '/api/s3/files/download/'
     | '/api/s3/files/move/'
     | '/api/s3/files/preview/'
+    | '/api/s3/files/share/'
     | '/api/s3/buckets/refetch/$providerId/'
     | '/api/s3/files/multipart/abort/'
     | '/api/s3/files/multipart/complete/'
@@ -296,10 +332,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
+  R404IndexRoute: typeof R404IndexRoute
   AboutIndexRoute: typeof AboutIndexRoute
   SigninIndexRoute: typeof SigninIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiHealthIndexRoute: typeof ApiHealthIndexRoute
+  FFileIdIndexRoute: typeof FFileIdIndexRoute
   ApiS3AccountsIndexRoute: typeof ApiS3AccountsIndexRoute
   ApiS3BucketsIndexRoute: typeof ApiS3BucketsIndexRoute
   ApiS3CredentialIndexRoute: typeof ApiS3CredentialIndexRoute
@@ -309,6 +347,7 @@ export interface RootRouteChildren {
   ApiS3FilesDownloadIndexRoute: typeof ApiS3FilesDownloadIndexRoute
   ApiS3FilesMoveIndexRoute: typeof ApiS3FilesMoveIndexRoute
   ApiS3FilesPreviewIndexRoute: typeof ApiS3FilesPreviewIndexRoute
+  ApiS3FilesShareIndexRoute: typeof ApiS3FilesShareIndexRoute
   ApiS3BucketsRefetchProviderIdIndexRoute: typeof ApiS3BucketsRefetchProviderIdIndexRoute
   ApiS3FilesMultipartAbortIndexRoute: typeof ApiS3FilesMultipartAbortIndexRoute
   ApiS3FilesMultipartCompleteIndexRoute: typeof ApiS3FilesMultipartCompleteIndexRoute
@@ -343,6 +382,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof ProtectedIndexRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/404/': {
+      id: '/404/'
+      path: '/404'
+      fullPath: '/404/'
+      preLoaderRoute: typeof R404IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/f/$fileId/': {
+      id: '/f/$fileId/'
+      path: '/f/$fileId'
+      fullPath: '/f/$fileId/'
+      preLoaderRoute: typeof FFileIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/health/': {
       id: '/api/health/'
@@ -413,6 +466,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$providerId/$bucketId/'
       preLoaderRoute: typeof ProtectedProviderIdBucketIdIndexRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/api/s3/files/share/': {
+      id: '/api/s3/files/share/'
+      path: '/api/s3/files/share'
+      fullPath: '/api/s3/files/share/'
+      preLoaderRoute: typeof ApiS3FilesShareIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/s3/files/preview/': {
       id: '/api/s3/files/preview/'
@@ -495,10 +555,12 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
+  R404IndexRoute: R404IndexRoute,
   AboutIndexRoute: AboutIndexRoute,
   SigninIndexRoute: SigninIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiHealthIndexRoute: ApiHealthIndexRoute,
+  FFileIdIndexRoute: FFileIdIndexRoute,
   ApiS3AccountsIndexRoute: ApiS3AccountsIndexRoute,
   ApiS3BucketsIndexRoute: ApiS3BucketsIndexRoute,
   ApiS3CredentialIndexRoute: ApiS3CredentialIndexRoute,
@@ -508,6 +570,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiS3FilesDownloadIndexRoute: ApiS3FilesDownloadIndexRoute,
   ApiS3FilesMoveIndexRoute: ApiS3FilesMoveIndexRoute,
   ApiS3FilesPreviewIndexRoute: ApiS3FilesPreviewIndexRoute,
+  ApiS3FilesShareIndexRoute: ApiS3FilesShareIndexRoute,
   ApiS3BucketsRefetchProviderIdIndexRoute:
     ApiS3BucketsRefetchProviderIdIndexRoute,
   ApiS3FilesMultipartAbortIndexRoute: ApiS3FilesMultipartAbortIndexRoute,

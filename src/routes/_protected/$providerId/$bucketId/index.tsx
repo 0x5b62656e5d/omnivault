@@ -15,6 +15,7 @@ import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { stripExtension } from "@/lib/fileExtension";
 import { getFileSizeUnits } from "@/lib/filesizeUnits";
+import { useFileShareForm } from "@/components/forms/shareFileForm";
 
 type DirectoryEntry =
     | {
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/_protected/$providerId/$bucketId/")({
 function RouteComponent() {
     const { queryClient } = Route.useRouteContext();
     const [showUploadFileForm, setShowUploadFileForm] = useState(false);
+    const [showFileShareForm, setShowFileShareForm] = useState(false);
     const [errorMsg, setErrormsg] = useState<string | null>(null);
     const { providerId, bucketId } = Route.useParams();
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<
@@ -48,6 +50,7 @@ function RouteComponent() {
     const [isDeletingFile, setIsDeletingFile] = useState(false);
     const [showRenameForm, setShowRenameForm] = useState(false);
     const [oldFilename, setOldFilename] = useState<string>("");
+    const [sharedFileName, setSharedFilename] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [showMoveBucketForm, setShowMoveBucketForm] = useState(false);
     const [bucketList, setBucketList] = useState<
@@ -183,6 +186,16 @@ function RouteComponent() {
         bucketId,
         oldFilename,
         queryClient,
+        disabled: isUploading || isRefetching || isLoading,
+        isUploading,
+    });
+
+    const fileShareForm = useFileShareForm({
+        setShowFileShareForm,
+        setErrormsg,
+        providerId,
+        bucketId,
+        fileKey: sharedFileName ?? "",
         disabled: isUploading || isRefetching || isLoading,
         isUploading,
     });
@@ -384,6 +397,11 @@ function RouteComponent() {
 
     const handleUploadFile = () => {
         setShowUploadFileForm(true);
+    };
+
+    const handleShareFile = (fileKey: string) => {
+        setSharedFilename(fileKey);
+        setShowFileShareForm(true);
     };
 
     const handleRenameFile = (filename: string) => {
@@ -689,6 +707,21 @@ function RouteComponent() {
                                     >
                                         Download
                                     </Button>
+                                    <Button
+                                        type="button"
+                                        key={`${idx}-Share`}
+                                        onClick={() =>
+                                            handleShareFile(entry.key)
+                                        }
+                                        className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                        disabled={
+                                            isDeletingFile ||
+                                            isLoading ||
+                                            isRefetching
+                                        }
+                                    >
+                                        Share
+                                    </Button>
                                     <DeleteButton
                                         onClick={() => {
                                             deleteFile(entry.key);
@@ -706,48 +739,73 @@ function RouteComponent() {
                                 </div>
                             )}
                             <div className="hidden lg:flex flex-col gap-2">
-                                <Button
-                                    type="button"
-                                    key={`${idx}-Rename`}
-                                    onClick={() => handleRenameFile(entry.key)}
-                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                    disabled={
-                                        isDeletingFile ||
-                                        isLoading ||
-                                        isRefetching
-                                    }
-                                >
-                                    Rename
-                                </Button>
-                                <Button
-                                    type="button"
-                                    key={`${idx}-Move`}
-                                    onClick={() => handleMoveFile(entry.key)}
-                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                    disabled={
-                                        isDeletingFile ||
-                                        isLoading ||
-                                        isRefetching
-                                    }
-                                    variant="secondary"
-                                >
-                                    Move
-                                </Button>
-                            </div>
-                            <div className="hidden lg:flex flex-col gap-2">
-                                <Button
-                                    type="button"
-                                    key={`${idx}-Download`}
-                                    onClick={() => getPresignedUrl(entry.key)}
-                                    className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
-                                    disabled={
-                                        isDeletingFile ||
-                                        isLoading ||
-                                        isRefetching
-                                    }
-                                >
-                                    Download
-                                </Button>
+                                <div className="hidden lg:flex gap-2">
+                                    <div className="hidden lg:flex flex-col gap-2">
+                                        <Button
+                                            type="button"
+                                            key={`${idx}-Rename`}
+                                            onClick={() =>
+                                                handleRenameFile(entry.key)
+                                            }
+                                            className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                            disabled={
+                                                isDeletingFile ||
+                                                isLoading ||
+                                                isRefetching
+                                            }
+                                        >
+                                            Rename
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            key={`${idx}-Move`}
+                                            onClick={() =>
+                                                handleMoveFile(entry.key)
+                                            }
+                                            className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                            disabled={
+                                                isDeletingFile ||
+                                                isLoading ||
+                                                isRefetching
+                                            }
+                                            variant="secondary"
+                                        >
+                                            Move
+                                        </Button>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col gap-2">
+                                        <Button
+                                            type="button"
+                                            key={`${idx}-Download`}
+                                            onClick={() =>
+                                                getPresignedUrl(entry.key)
+                                            }
+                                            className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                            disabled={
+                                                isDeletingFile ||
+                                                isLoading ||
+                                                isRefetching
+                                            }
+                                        >
+                                            Download
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            key={`${idx}-Share`}
+                                            onClick={() =>
+                                                handleShareFile(entry.key)
+                                            }
+                                            className={`${isLoading || isRefetching || isDeletingFile ? "cursor-not-allowed opacity-70 pointer-events-none" : ""}`}
+                                            disabled={
+                                                isDeletingFile ||
+                                                isLoading ||
+                                                isRefetching
+                                            }
+                                        >
+                                            Share
+                                        </Button>
+                                    </div>
+                                </div>
                                 <DeleteButton
                                     onClick={() => deleteFile(entry.key)}
                                     deleteConfirmationId={deleteConfirmationId}
@@ -798,6 +856,7 @@ function RouteComponent() {
                     />
                 )}
                 {showUploadFileForm && fileUploadForm.component}
+                {showFileShareForm && fileShareForm.component}
             </AnimatePresence>
         </div>
     );

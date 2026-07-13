@@ -303,6 +303,10 @@ u {
     text-underline-offset: 3px;
 }
 
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
 code {
     font-size: 0.9em;
     border: 1px solid var(--line);
