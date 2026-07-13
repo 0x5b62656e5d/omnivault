@@ -254,14 +254,6 @@ function RouteComponent() {
                         size: 0,
                         isEmpty: folderChildren.length === 0,
                     });
-
-                    entries.push({
-                        type: "folder",
-                        name: folderName,
-                        key: folderKey,
-                        size: 0,
-                        isEmpty: folderChildren.length === 0,
-                    });
                 }
 
                 return entries;
