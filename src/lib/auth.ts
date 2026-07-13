@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { db } from "@/db";
@@ -34,5 +35,12 @@ export const auth = betterAuth({
             clientSecret: env.RAILWAY_CLIENT_SECRET,
         },
     },
-    plugins: [tanstackStartCookies()],
+    plugins: [
+        passkey({
+            registration: {
+                requireSession: false,
+            },
+        }),
+        tanstackStartCookies(),
+    ],
 });
