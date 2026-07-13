@@ -46,23 +46,26 @@ function RouteComponent() {
             callbackURL: "/",
         });
     };
-    
-	const signinWithPasskey = async (
-		_event: React.MouseEvent<HTMLButtonElement>,
-	) => {
-		await authClient.signIn.passkey({
-			autoFill: false,
-			extensions: undefined,
-			fetchOptions: {
-				onSuccess() {
-					window.location.href = "/";
-				},
-				onError(context) {
-					console.error("Authentication failed:", context.error.message);
-				},
-			},
-		});
-	};
+
+    const signinWithPasskey = async (
+        _event: React.MouseEvent<HTMLButtonElement>,
+    ) => {
+        await authClient.signIn.passkey({
+            autoFill: false,
+            extensions: undefined,
+            fetchOptions: {
+                onSuccess() {
+                    window.location.href = "/";
+                },
+                onError(context) {
+                    console.error(
+                        "Authentication failed:",
+                        context.error.message,
+                    );
+                },
+            },
+        });
+    };
 
     return (
         <div className="w-full flex flex-col justify-center items-center m-4 p-4 gap-4">
@@ -77,8 +80,8 @@ function RouteComponent() {
                 <SiRailway /> Sign in with Railway
             </Button>
             <Button onClick={signinWithPasskey} type="button">
-				<FaKey /> Sign in with a passkey
-			</Button>
+                <FaKey /> Sign in with a passkey
+            </Button>
         </div>
     );
 }
