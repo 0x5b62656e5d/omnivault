@@ -7,7 +7,15 @@ import { defineConfig } from "vite";
 
 const config = defineConfig({
     resolve: { tsconfigPaths: true },
-    plugins: [devtools(), tailwindcss(), tanstackStart(), nitro(), viteReact()],
+    plugins: [
+        devtools(),
+        tailwindcss(),
+        tanstackStart(),
+        nitro({
+            plugins: ["./src/lib/cron.ts"],
+        }),
+        viteReact(),
+    ],
 });
 
 export default config;
