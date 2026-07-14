@@ -1,9 +1,9 @@
-FROM node:24-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
 COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY bun.lock ./
 
 ARG DATABASE_URL
 ARG ENCRYPTION_KEY
@@ -21,49 +21,35 @@ ARG RAILWAY_CLIENT_SECRET
 ARG BETTER_AUTH_SECRET
 ARG ENVIRONMENT
 
-ENV DATABASE_URL={DATABASE_URL}
-ENV ENCRYPTION_KEY={ENCRYPTION_KEY}
-ENV HMAC_KEY={HMAC_KEY}
-ENV ENCRYPTION_METHOD={ENCRYPTION_METHOD}
-ENV IV_LENGTH={IV_LENGTH}
-ENV KDF_SALT={KDF_SALT}
-ENV BASE_URL={BASE_URL}
-ENV DISCORD_CLIENT_ID={DISCORD_CLIENT_ID}
-ENV DISCORD_CLIENT_SECRET={DISCORD_CLIENT_SECRET}
-ENV GITHUB_CLIENT_ID={GITHUB_CLIENT_ID}
-ENV GITHUB_CLIENT_SECRET={GITHUB_CLIENT_SECRET}
-ENV RAILWAY_CLIENT_ID={RAILWAY_CLIENT_ID}
-ENV RAILWAY_CLIENT_SECRET={RAILWAY_CLIENT_SECRET}
-ENV BETTER_AUTH_SECRET={BETTER_AUTH_SECRET}
-ENV ENVIRONMENT={ENVIRONMENT}
+ENV DATABASE_URL=${DATABASE_URL}
+ENV ENCRYPTION_KEY=${ENCRYPTION_KEY}
+ENV HMAC_KEY=${HMAC_KEY}
+ENV ENCRYPTION_METHOD=${ENCRYPTION_METHOD}
+ENV IV_LENGTH=${IV_LENGTH}
+ENV KDF_SALT=${KDF_SALT}
+ENV BASE_URL=${BASE_URL}
+ENV DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+ENV DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+ENV GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+ENV GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+ENV RAILWAY_CLIENT_ID=${RAILWAY_CLIENT_ID}
+ENV RAILWAY_CLIENT_SECRET=${RAILWAY_CLIENT_SECRET}
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV ENVIRONMENT=${ENVIRONMENT}
 
-RUN npm install -g pnpm@10
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm run build
+RUN bun run build
 
-# FROM node:24-alpine AS migrator
 
-# WORKDIR /app
+FROM oven/bun:1-alpine AS runner
 
-# RUN npm install -g pnpm
+WORKDIR /app
 
-# COPY --from=builder /app/package.json ./package.json
-# COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
-# COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-# COPY --from=builder /app/src/db ./src/db
+COPY --from=builder /app/.output ./.output
 
-# CMD ["pnpm", "db:migrate"]
+EXPOSE 3000
 
-# FROM alpine:3.20 AS runner
-
-# WORKDIR /app
-
-# RUN apk add --no-cache nodejs
-
-# COPY --from=builder /app/.output ./.output
-
-CMD ["node", ".output/server/index.mjs"]
+CMD ["bun", "run", ".output/server/index.mjs"]
