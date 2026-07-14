@@ -6,10 +6,10 @@
         "#/*": "./src/*"
     },
     "scripts": {
-        "start": "node ./.output/server/index.mjs",
-        "start:dev": "node --env-file=.env ./.output/server/index.mjs",
-        "dev": "vite dev --port 3000",
-        "build": "vite build",
+        "start": "bun ./.output/server/index.mjs",
+        "start:dev": "bun --env-file=.env ./.output/server/index.mjs",
+        "dev": "bun --bun vite dev --port 3000",
+        "build": "bun --bun vite build",
         "preview": "vite preview",
         "test": "vitest run",
         "format": "biome format",
