@@ -198,6 +198,7 @@ function RouteComponent() {
         fileKey: sharedFileName ?? "",
         disabled: isUploading || isRefetching || isLoading,
         isUploading,
+        customBucketUrl
     });
 
     const directoryEntries = (data || []).reduce<DirectoryEntry[]>(

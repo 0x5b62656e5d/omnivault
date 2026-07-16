@@ -12,6 +12,7 @@ export const useFileShareForm = ({
     fileKey,
     disabled,
     isUploading,
+    customBucketUrl,
 }: {
     setShowFileShareForm: (show: boolean) => void;
     setErrormsg: (msg: string | null) => void;
@@ -20,6 +21,7 @@ export const useFileShareForm = ({
     fileKey: string;
     disabled: boolean;
     isUploading: boolean;
+    customBucketUrl: string | null;
 }) => {
     const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -180,38 +182,42 @@ export const useFileShareForm = ({
                             )}
                         </form.Field>
 
-                        <form.Field name="preview">
-                            {field => (
-                                <label className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium">
-                                            Preview (if the URL should download
-                                            the file)
-                                        </span>
-                                        <input
-                                            value={
-                                                field.state.value
-                                                    ? "true"
-                                                    : "false"
-                                            }
-                                            onBlur={field.handleBlur}
-                                            onChange={event => {
-                                                field.handleChange(
-                                                    event.target.checked,
-                                                );
-                                            }}
-                                            type="checkbox"
-                                            className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
-                                        />
-                                    </div>
-                                    {field.state.meta.errors.length > 0 && (
-                                        <span className="text-sm text-destructive">
-                                            {field.state.meta.errors.join(", ")}
-                                        </span>
-                                    )}
-                                </label>
-                            )}
-                        </form.Field>
+                        {!customBucketUrl && (
+                            <form.Field name="preview">
+                                {field => (
+                                    <label className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium">
+                                                Preview (if the URL should
+                                                download the file)
+                                            </span>
+                                            <input
+                                                value={
+                                                    field.state.value
+                                                        ? "true"
+                                                        : "false"
+                                                }
+                                                onBlur={field.handleBlur}
+                                                onChange={event => {
+                                                    field.handleChange(
+                                                        event.target.checked,
+                                                    );
+                                                }}
+                                                type="checkbox"
+                                                className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
+                                            />
+                                        </div>
+                                        {field.state.meta.errors.length > 0 && (
+                                            <span className="text-sm text-destructive">
+                                                {field.state.meta.errors.join(
+                                                    ", ",
+                                                )}
+                                            </span>
+                                        )}
+                                    </label>
+                                )}
+                            </form.Field>
+                        )}
 
                         <div className="mt-2 flex justify-end gap-2">
                             <Button

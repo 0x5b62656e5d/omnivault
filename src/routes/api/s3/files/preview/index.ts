@@ -96,6 +96,25 @@ export const Route = createFileRoute("/api/s3/files/preview/")({
                     );
                 }
 
+                if (row.bucket.customUrl) {
+                    return new Response(
+                        JSON.stringify(
+                            createStandardResponse(
+                                true,
+                                `${row.bucket.customUrl}/${fileIdentifier}`,
+                                null,
+                                null,
+                            ),
+                        ),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            status: 200,
+                        },
+                    );
+                }
+
                 try {
                     const signedUrl = await getSignedUrl(
                         createClient(row.bucket.region, {
