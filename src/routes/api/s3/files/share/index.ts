@@ -145,7 +145,7 @@ export const Route = createFileRoute("/api/s3/files/share/")({
                         JSON.stringify(
                             createStandardResponse(
                                 true,
-                                returnedRow[0].id,
+                                `${env.BASE_URL}/${returnedRow[0].id}`,
                                 null,
                                 null,
                             ),
