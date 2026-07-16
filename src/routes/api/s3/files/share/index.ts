@@ -63,12 +63,6 @@ export const Route = createFileRoute("/api/s3/files/share/")({
                         },
                     );
                 }
-                console.log(
-                    providerId,
-                    bucketId,
-                    fileIdentifier,
-                    expiresAt / 1000,
-                );
 
                 const [row] = await db
                     .select({
@@ -109,7 +103,6 @@ export const Route = createFileRoute("/api/s3/files/share/")({
                 }
 
                 if (row.bucket.customUrl) {
-                    console.log("asdfjaskdlf");
                     const returnedRow = await db
                         .insert(fileUrls)
                         .values({
